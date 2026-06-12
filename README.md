@@ -1,6 +1,6 @@
 # OLO Jiggler (By Micromaker Labs)
 
-A sleek, productivity-focused desk companion built on the ESP32-C3 Super Mini. Designed by Micromaker Labs, the OLO Jiggler acts as a Bluetooth Low Energy (BLE) mouse jiggler to keep your workstation active, while also serving as a Pomodoro timer, habit tracker, and interactive desk pet.
+A sleek, productivity-focused desk companion built on the **ESP32-C3 Super Mini**. Designed by Micromaker Labs, the OLO Jiggler acts as a Bluetooth Low Energy (BLE) mouse jiggler to keep your workstation active, while also serving as a Pomodoro timer, habit tracker, and interactive desk pet.
 
 ## Features
 * **BLE Mouse Jiggler:** Undetectable, hardware-free host connection. Features Slow, Fast, Zigzag, Square, and Wave movement modes.
@@ -15,7 +15,7 @@ A sleek, productivity-focused desk companion built on the ESP32-C3 Super Mini. D
 | OLED SDA | GPIO 20 |
 | OLED SCL | GPIO 21 |
 | Passive Buzzer | GPIO 2 |
-| Push Button | GPIO 1 |
+| TTP233 Sensor | GPIO 1 |
 | Status LED | GPIO 8 (Built-in) |
 
 ## Installation & Flashing
