@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OLO Jiggler Web Installer | Micromaker Labs</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    
+    <script type="module" src="https://unpkg.com/esp-web-tools@10/dist/web/install-button.js?module"></script>
+
+    <style>
+        /* --- GREY & ORANGE THEME --- */
+        :root {
+            --bg-gradient: linear-gradient(135deg, #2d3436 0%, #000000 100%);
+            --glass-bg: rgba(255, 255, 255, 0.05);
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --accent: #ff793f; /* Vibrant Orange */
+            --accent-hover: #cd6133;
+            --terminal-bg: #1e272e;
+            --terminal-text: #ff793f;
+        }
+
+        body {
+            background: var(--bg-gradient);
+            min-height: 100vh;
+            color: #d1d8e0;
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            padding: 40px 0;
+        }
+
+        .glass-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(12px);
+            border: 1px solid var(--glass-border);
+            border-radius: 16px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+            padding: 30px;
+            margin-bottom: 25px;
+        }
+
+        .text-accent {
+            color: var(--accent) !important;
+        }
+
+        .step-number {
+            background: var(--accent);
+            color: #fff;
+            width: 30px;
+            height: 30px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            font-weight: bold;
+            margin-right: 10px;
+        }
+
+        .log-container { 
+            background: var(--terminal-bg); 
+            border-radius: 12px; 
+            overflow: hidden; 
+            border: 1px solid #3d3d3d; 
+            margin-top: 20px;
+        }
+        
+        .log-header {
+            background: #2f3640;
+            padding: 8px 15px;
+            font-family: monospace;
+            font-size: 0.9rem;
+            color: #7f8fa6;
+            border-bottom: 1px solid #3d3d3d;
+            display: flex;
+            align-items: center;
+        }
+
+        .log-header i { margin-right: 8px; color: var(--accent); }
+
+        .log-content { 
+            height: 200px; 
+            overflow-y: auto; 
+            padding: 15px; 
+            color: var(--terminal-text); 
+            font-family: monospace; 
+            font-size: 0.85rem; 
+        }
+
+        /* Customizing the ESP Web Tools Button to match theme */
+        esp-web-install-button {
+            --esp-tools-button-color: #ff793f;
+            --esp-tools-button-text-color: #fff;
+            --esp-tools-button-border-radius: 12px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container max-w-4xl">
+    
+    <div class="text-center mb-5">
+        <h1 class="fw-bold"><span class="text-accent">OLO</span> Jiggler Installer</h1>
+        <p class="text-muted">Official Firmware Flasher by Micromaker Labs</p>
+    </div>
+
+    <div class="row">
+        <div class="col-md-7">
+            <div class="glass-card">
+                <h4 class="mb-4 text-white"><i class="fa-solid fa-list-check text-accent me-2"></i> Prerequisites</h4>
+                <ul class="list-unstyled">
+                    <li class="mb-2"><i class="fa-brands fa-chrome text-accent me-2"></i> <strong>Supported Browser:</strong> Use Google Chrome, Microsoft Edge, or Brave on a desktop computer (Safari/Firefox are not supported).</li>
+                    <li class="mb-2"><i class="fa-solid fa-usb text-accent me-2"></i> <strong>Data Cable:</strong> A USB-C cable capable of data transfer (not just charging).</li>
+                    <li class="mb-2"><i class="fa-solid fa-microchip text-accent me-2"></i> <strong>Hardware:</strong> An ESP32-C3 Super Mini board wired according to the OLO schematic.</li>
+                </ul>
+            </div>
+
+            <div class="glass-card">
+                <h4 class="mb-4 text-white"><i class="fa-solid fa-book-open text-accent me-2"></i> Installation Manual</h4>
+                <div class="mb-3">
+                    <span class="step-number">1</span> <strong>Connect the Board:</strong> Plug the ESP32-C3 into your computer's USB port.
+                </div>
+                <div class="mb-3">
+                    <span class="step-number">2</span> <strong>Initialize Flasher:</strong> Click the "Connect" button in the panel on the right.
+                </div>
+                <div class="mb-3">
+                    <span class="step-number">3</span> <strong>Select Port:</strong> A browser popup will appear. Select the COM port labeled "USB Serial Device" or "CH343" and click Connect.
+                </div>
+                <div class="mb-3">
+                    <span class="step-number">4</span> <strong>Install:</strong> Click "Install OLO Bit". The process takes about 60 seconds. Do not unplug the device until the success message appears.
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-5">
+            <div class="glass-card text-center">
+                <h4 class="mb-3 text-white">Device Connection</h4>
+                <p class="small text-muted mb-4">Firmware Version: 1.0.0 | Architecture: ESP32-C3</p>
+                
+                <div class="d-flex justify-content-center mb-3">
+                    <esp-web-install-button manifest="manifest.json"></esp-web-install-button>
+                </div>
+                <p class="small text-muted mt-2">Requires Web Serial API</p>
+            </div>
+
+            <div class="log-container">
+                <div class="log-header">
+                    <i class="fa-solid fa-terminal"></i> Serial Monitor / Flash Logs
+                </div>
+                <div class="log-content" id="terminal-output">
+                    > System ready...<br>
+                    > Waiting for device connection...<br>
+                    > Note: Detailed flashing logs will appear in the connection dialog.<br>
+                    > Once flashed, the OLO Jiggler will boot automatically.<br>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+</body>
+</html>
