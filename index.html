@@ -7,6 +7,7 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     
+    <!-- Import ESP Web Tools -->
     <script type="module" src="https://unpkg.com/esp-web-tools@10/dist/web/install-button.js?module"></script>
 
     <style>
@@ -54,6 +55,7 @@
             border-radius: 50%;
             font-weight: bold;
             margin-right: 10px;
+            flex-shrink: 0;
         }
 
         .log-container { 
@@ -119,6 +121,12 @@
         .pin-table tr:last-child td {
             border-bottom: none;
         }
+        
+        .manual-step {
+            display: flex;
+            align-items: flex-start;
+            height: 100%;
+        }
     </style>
 </head>
 <body>
@@ -130,34 +138,73 @@
         <p class="text-muted">BLE Mouse Jiggler & Display by Micromaker Labs</p>
     </div>
 
+    <!-- Top Full-Width Row: Installation Manual -->
     <div class="row">
+        <div class="col-12">
+            <div class="glass-card">
+                <h4 class="mb-4 text-white"><i class="fa-solid fa-book-open text-accent me-2"></i> Installation Manual</h4>
+                <div class="row g-4">
+                    <div class="col-md-3">
+                        <div class="manual-step">
+                            <span class="step-number">1</span> 
+                            <div><strong>Connect Board:</strong><br><span class="text-muted small">Plug the ESP32-C3 Super Mini into your computer's USB port.</span></div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="manual-step">
+                            <span class="step-number">2</span> 
+                            <div><strong>Initialize:</strong><br><span class="text-muted small">Click the "Connect" button in the device panel below.</span></div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="manual-step">
+                            <span class="step-number">3</span> 
+                            <div><strong>Select Port:</strong><br><span class="text-muted small">In the browser popup, select the COM port labeled "USB Serial Device" or "CH343".</span></div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="manual-step">
+                            <span class="step-number">4</span> 
+                            <div><strong>Install:</strong><br><span class="text-muted small">Click "Install OLO Jiggler". Wait ~60s until the success message appears.</span></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bottom Split Row: Flasher vs Hardware Guide -->
+    <div class="row">
+        <!-- Left Column: Flasher & Terminal -->
         <div class="col-md-5">
-            <div class="glass-card text-center">
+            <div class="glass-card text-center h-100">
                 <h4 class="mb-3 text-white">Device Connection</h4>
                 <p class="small text-muted mb-4">Firmware Version: 1.0.0<br>Architecture: ESP32-C3 Super Mini</p>
                 
+                <!-- The ESP Web Tools Button -->
                 <div class="d-flex justify-content-center mb-3">
                     <esp-web-install-button manifest="manifest.json"></esp-web-install-button>
                 </div>
                 <p class="small text-muted mt-2">Requires Web Serial API</p>
-            </div>
 
-            <div class="log-container">
-                <div class="log-header">
-                    <i class="fa-solid fa-terminal"></i> Serial Monitor / Flash Logs
-                </div>
-                <div class="log-content" id="terminal-output">
-                    > System ready...<br>
-                    > Waiting for device connection...<br>
-                    > Note: Detailed flashing logs will appear in the connection dialog.<br>
-                    > Ensure your ESP32-C3 Super Mini is connected via a data-capable USB cable.<br>
-                    > Once flashed, the OLO Jiggler will boot automatically.<br>
+                <div class="log-container text-start">
+                    <div class="log-header">
+                        <i class="fa-solid fa-terminal"></i> Serial Monitor / Flash Logs
+                    </div>
+                    <div class="log-content" id="terminal-output">
+                        > System ready...<br>
+                        > Waiting for device connection...<br>
+                        > Note: Detailed flashing logs will appear in the connection dialog.<br>
+                        > Ensure your ESP32-C3 Super Mini is connected via a data-capable USB cable.<br>
+                        > Once flashed, the OLO Jiggler will boot automatically.<br>
+                    </div>
                 </div>
             </div>
         </div>
 
+        <!-- Right Column: Wiring & Prerequisites -->
         <div class="col-md-7">
-            <div class="glass-card">
+            <div class="glass-card h-100">
                 <h4 class="mb-3 text-white"><i class="fa-solid fa-microchip text-accent me-2"></i> Hardware & Wiring Guide</h4>
                 <div class="p-3 mb-3 rounded" style="background: rgba(255, 121, 63, 0.1); border: 1px solid var(--accent);">
                     <strong><i class="fa-solid fa-triangle-exclamation text-accent me-1"></i> Important:</strong> This firmware is strictly compiled for the <strong>ESP32-C3 Super Mini</strong>. It will not work on standard ESP32 or ESP8266 boards.
@@ -191,26 +238,11 @@
                     </tbody>
                 </table>
                 
-                <ul class="list-unstyled mt-4">
+                <h5 class="text-white mt-4 mb-3">Prerequisites</h5>
+                <ul class="list-unstyled">
                     <li class="mb-2"><i class="fa-brands fa-chrome text-accent me-2"></i> <strong>Browser:</strong> Chrome, Edge, Brave, or Opera on desktop.</li>
                     <li class="mb-2"><i class="fa-solid fa-usb text-accent me-2"></i> <strong>Cable:</strong> A USB-C cable capable of data transfer.</li>
                 </ul>
-            </div>
-
-            <div class="glass-card">
-                <h4 class="mb-4 text-white"><i class="fa-solid fa-book-open text-accent me-2"></i> Installation Manual</h4>
-                <div class="mb-3">
-                    <span class="step-number">1</span> <strong>Connect the Board:</strong> Plug the ESP32-C3 Super Mini into your computer's USB port.
-                </div>
-                <div class="mb-3">
-                    <span class="step-number">2</span> <strong>Initialize Flasher:</strong> Click the "Connect" button in the panel on the left.
-                </div>
-                <div class="mb-3">
-                    <span class="step-number">3</span> <strong>Select Port:</strong> A browser popup will appear. Select the COM port labeled "USB Serial Device" or "CH343" and click Connect.
-                </div>
-                <div class="mb-3">
-                    <span class="step-number">4</span> <strong>Install:</strong> Click "Install OLO Jiggler". The process takes about 60 seconds. Do not unplug the device until the success message appears.
-                </div>
             </div>
         </div>
     </div>
