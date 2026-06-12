@@ -10,13 +10,12 @@ A sleek, productivity-focused desk companion built on the **ESP32-C3 Super Mini*
 * **Web Controller:** A responsive, dark-glass themed (Grey & Vibrant Orange) web interface to configure the device seamlessly via browser.
 
 ## Hardware Wiring
-| Component | ESP32-C3 Pin |
+| Component | ESP32-C3 Supermini Pin |
 | :--- | :--- |
 | OLED SDA | GPIO 20 |
 | OLED SCL | GPIO 21 |
 | Passive Buzzer | GPIO 2 |
 | TTP233 Sensor | GPIO 1 |
-| Status LED | GPIO 8 (Built-in) |
 
 ## Installation & Flashing
 You don't need an IDE to install the firmware. Connect your ESP32-C3 to your computer via a data-capable USB-C cable and visit our **[Web Installer Link]** to flash the device directly from your browser. 
