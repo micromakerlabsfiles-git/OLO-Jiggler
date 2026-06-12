@@ -7,7 +7,6 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     
-    <!-- Import ESP Web Tools -->
     <script type="module" src="https://unpkg.com/esp-web-tools@10/dist/web/install-button.js?module"></script>
 
     <style>
@@ -75,6 +74,7 @@
             border-bottom: 1px solid #3d3d3d;
             display: flex;
             align-items: center;
+            justify-content: space-between;
         }
 
         .log-header i { margin-right: 8px; color: var(--accent); }
@@ -86,6 +86,8 @@
             color: var(--terminal-text); 
             font-family: monospace; 
             font-size: 0.85rem; 
+            white-space: pre-wrap; /* Ensures real-time logs format correctly */
+            word-wrap: break-word;
         }
 
         /* Customizing the ESP Web Tools Button to match theme */
@@ -93,6 +95,21 @@
             --esp-tools-button-color: #ff793f;
             --esp-tools-button-text-color: #fff;
             --esp-tools-button-border-radius: 12px;
+        }
+
+        .btn-serial {
+            background: transparent;
+            border: 1px solid var(--accent);
+            color: var(--accent);
+            border-radius: 8px;
+            padding: 8px 16px;
+            font-size: 0.9rem;
+            transition: all 0.3s;
+        }
+
+        .btn-serial:hover {
+            background: var(--accent);
+            color: #fff;
         }
 
         .pin-table {
@@ -135,10 +152,9 @@
     
     <div class="text-center mb-5">
         <h1 class="fw-bold"><span class="text-accent">OLO</span> Jiggler Installer</h1>
-        <p class="text-muted">BLE Mouse Jiggler with display by Micromaker Labs</p>
+        <p class="text-muted">BLE Mouse Jiggler with Display by Micromaker Labs</p>
     </div>
 
-    <!-- Top Full-Width Row: Installation Manual -->
     <div class="row">
         <div class="col-12">
             <div class="glass-card">
@@ -173,36 +189,29 @@
         </div>
     </div>
 
-    <!-- Bottom Split Row: Flasher vs Hardware Guide -->
     <div class="row">
-        <!-- Left Column: Flasher & Terminal -->
         <div class="col-md-5">
             <div class="glass-card text-center h-100">
                 <h4 class="mb-3 text-white">Device Connection</h4>
                 <p class="small text-muted mb-4">Firmware Version: 1.0.0<br>Architecture: ESP32-C3 Super Mini</p>
                 
-                <!-- The ESP Web Tools Button -->
-                <div class="d-flex justify-content-center mb-3">
+                <div class="d-flex justify-content-center mb-4">
                     <esp-web-install-button manifest="manifest.json"></esp-web-install-button>
                 </div>
-                <p class="small text-muted mt-2">Requires Web Serial API</p>
+                
+                <button id="serial-btn" class="btn-serial w-100"><i class="fa-solid fa-plug me-2"></i>Connect Live Serial Monitor</button>
 
-                <div class="log-container text-start">
+                <div class="log-container text-start mt-4">
                     <div class="log-header">
-                        <i class="fa-solid fa-terminal"></i> Serial Monitor / Flash Logs
+                        <div><i class="fa-solid fa-terminal"></i> System Terminal</div>
+                        <i class="fa-solid fa-trash text-muted" id="clear-btn" style="cursor: pointer;" title="Clear Terminal"></i>
                     </div>
-                    <div class="log-content" id="terminal-output">
-                        > System ready...<br>
-                        > Waiting for device connection...<br>
-                        > Note: Detailed flashing logs will appear in the connection dialog.<br>
-                        > Ensure your ESP32-C3 Super Mini is connected via a data-capable USB cable.<br>
-                        > Once flashed, the OLO Jiggler will boot automatically.<br>
-                    </div>
+                    <div class="log-content" id="terminal-output">> System initialized. Ready to connect...
+</div>
                 </div>
             </div>
         </div>
 
-        <!-- Right Column: Wiring & Prerequisites -->
         <div class="col-md-7">
             <div class="glass-card h-100">
                 <h4 class="mb-3 text-white"><i class="fa-solid fa-microchip text-accent me-2"></i> Hardware & Wiring Guide</h4>
@@ -248,6 +257,83 @@
     </div>
 
 </div>
+
+<script>
+    const terminal = document.getElementById('terminal-output');
+    const serialBtn = document.getElementById('serial-btn');
+    const clearBtn = document.getElementById('clear-btn');
+    const installButton = document.querySelector('esp-web-install-button');
+
+    // Helper to print to terminal
+    function logMsg(msg) {
+        terminal.textContent += `> ${msg}\n`;
+        terminal.scrollTop = terminal.scrollHeight;
+    }
+
+    // Clear Terminal
+    clearBtn.addEventListener('click', () => {
+        terminal.textContent = '';
+    });
+
+    // 1. Hook into ESP Web Tools Flasher Events
+    installButton.addEventListener('state-changed', (e) => {
+        // ESP Web Tools States: 0: Idle, 1: Connecting, 2: Connected, 3: Initializing, 4: Flashing, 5: Finished, 6: Error
+        const stateMessages = [
+            "Idle", 
+            "Connecting to board...", 
+            "Connected successfully.", 
+            "Initializing flasher...", 
+            "Flashing firmware (Do not disconnect)...", 
+            "Flash Complete! Device is rebooting.", 
+            "Error occurred."
+        ];
+        logMsg(`[Flasher] ${stateMessages[e.detail.state] || "State: " + e.detail.state}`);
+    });
+
+    installButton.addEventListener('error', (e) => {
+        logMsg(`[Flasher Error] ${e.detail.message}`);
+    });
+
+    // 2. Real-Time Web Serial Monitor Logic
+    serialBtn.addEventListener('click', async () => {
+        if (!("serial" in navigator)) {
+            logMsg("[Error] Web Serial API is not supported in this browser.");
+            return;
+        }
+
+        try {
+            logMsg("[Serial] Requesting port access...");
+            const port = await navigator.serial.requestPort();
+            
+            // Standard baud rate for ESP32-C3 is 115200
+            await port.open({ baudRate: 115200 });
+            logMsg("[Serial] Connected at 115200 baud. Waiting for logs...\n-----------------------------------");
+            
+            serialBtn.innerHTML = '<i class="fa-solid fa-plug-circle-check me-2"></i>Serial Connected';
+            serialBtn.style.background = 'var(--accent)';
+            serialBtn.style.color = '#fff';
+
+            const decoder = new TextDecoderStream();
+            port.readable.pipeTo(decoder.writable);
+            const reader = decoder.readable.getReader();
+
+            // Stream data indefinitely
+            while (true) {
+                const { value, done } = await reader.read();
+                if (done) break;
+                if (value) {
+                    terminal.textContent += value;
+                    terminal.scrollTop = terminal.scrollHeight; // Auto-scroll
+                }
+            }
+        } catch (error) {
+            logMsg(`[Serial Error] ${error.message}`);
+            serialBtn.innerHTML = '<i class="fa-solid fa-plug me-2"></i>Connect Live Serial Monitor';
+            serialBtn.style.background = 'transparent';
+            serialBtn.style.color = 'var(--accent)';
+        }
+    });
+</script>
 
 </body>
 </html>
