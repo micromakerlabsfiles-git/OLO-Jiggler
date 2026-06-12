@@ -7,7 +7,6 @@ A sleek, productivity-focused desk companion built on the **ESP32-C3 Super Mini*
 * **Productivity Suite:** Built-in Pomodoro timer (25/5 min splits), daily habit tracker, and 100 rotating focus quotes.
 * **Mini-Games:** Flappy Block, Dino Run, and a Reaction Test to kill time during screen breaks.
 * **System Diagnostics:** Live CPU load, RAM usage, and internal temperature tracking graph.
-* **Web Controller:** A responsive, dark-glass themed (Grey & Vibrant Orange) web interface to configure the device seamlessly via browser.
 
 ## Hardware Wiring
 | Component | ESP32-C3 Supermini Pin |
@@ -18,10 +17,7 @@ A sleek, productivity-focused desk companion built on the **ESP32-C3 Super Mini*
 | TTP233 Sensor | GPIO 1 |
 
 ## Installation & Flashing
-You don't need an IDE to install the firmware. Connect your ESP32-C3 to your computer via a data-capable USB-C cable and visit our **[Web Installer Link]** to flash the device directly from your browser. 
-
-## The Web Controller
-The companion web app features a modern, glass-morphism UI with a custom `#1e272e` (Dark Grey) and `#ff793f` (Vibrant Orange) palette. It connects to the OLO Bit via Web Bluetooth, allowing you to change animations, adjust timers, and update settings without touching the device.
+You don't need an IDE to install the firmware. Connect your ESP32-C3 SuperMini to your computer via a data-capable USB-C cable and visit our [**[Web Installer Link]**](https://micromakerlabsfiles-git.github.io/OLO-Jiggler/) to flash the device directly from your browser. 
 
 ## Author
 Developed by **Micromaker Labs**.
