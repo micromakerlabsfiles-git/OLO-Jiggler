@@ -7,6 +7,7 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     
+    <!-- Import ESP Web Tools -->
     <script type="module" src="https://unpkg.com/esp-web-tools@10/dist/web/install-button.js?module"></script>
 
     <style>
@@ -15,10 +16,8 @@
             --bg-gradient: linear-gradient(135deg, #2d3436 0%, #000000 100%);
             --glass-bg: rgba(255, 255, 255, 0.05);
             --glass-border: rgba(255, 255, 255, 0.1);
-            --accent: #ff793f; /* Vibrant Orange */
+            --accent: #ff793f; 
             --accent-hover: #cd6133;
-            --terminal-bg: #1e272e;
-            --terminal-text: #ff793f;
         }
 
         body {
@@ -27,6 +26,7 @@
             color: #d1d8e0;
             font-family: 'Segoe UI', system-ui, sans-serif;
             padding: 40px 0;
+            user-select: none;
         }
 
         .glass-card {
@@ -35,13 +35,12 @@
             border: 1px solid var(--glass-border);
             border-radius: 16px;
             box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
-            padding: 30px;
+            padding: 25px;
             margin-bottom: 25px;
+            height: 100%;
         }
 
-        .text-accent {
-            color: var(--accent) !important;
-        }
+        .text-accent { color: var(--accent) !important; }
 
         .step-number {
             background: var(--accent);
@@ -57,131 +56,109 @@
             flex-shrink: 0;
         }
 
-        .log-container { 
-            background: var(--terminal-bg); 
-            border-radius: 12px; 
-            overflow: hidden; 
-            border: 1px solid #3d3d3d; 
-            margin-top: 20px;
-        }
-        
-        .log-header {
-            background: #2f3640;
-            padding: 8px 15px;
-            font-family: monospace;
-            font-size: 0.9rem;
-            color: #7f8fa6;
-            border-bottom: 1px solid #3d3d3d;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
-
-        .log-header i { margin-right: 8px; color: var(--accent); }
-
-        .log-content { 
-            height: 250px; 
-            overflow-y: auto; 
-            padding: 15px; 
-            color: var(--terminal-text); 
-            font-family: monospace; 
-            font-size: 0.85rem; 
-            white-space: pre-wrap; /* Ensures real-time logs format correctly */
-            word-wrap: break-word;
-        }
-
-        /* Customizing the ESP Web Tools Button to match theme */
         esp-web-install-button {
             --esp-tools-button-color: #ff793f;
             --esp-tools-button-text-color: #fff;
             --esp-tools-button-border-radius: 12px;
         }
 
-        .btn-serial {
-            background: transparent;
-            border: 1px solid var(--accent);
-            color: var(--accent);
-            border-radius: 8px;
-            padding: 8px 16px;
-            font-size: 0.9rem;
-            transition: all 0.3s;
-        }
-
-        .btn-serial:hover {
-            background: var(--accent);
-            color: #fff;
-        }
-
+        /* --- HARDWARE GUIDE CSS --- */
         .pin-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 15px;
-            margin-bottom: 15px;
-            background: rgba(0,0,0,0.2);
-            border-radius: 8px;
-            overflow: hidden;
+            width: 100%; border-collapse: collapse;
+            margin-top: 15px; margin-bottom: 15px;
+            background: rgba(0,0,0,0.2); border-radius: 8px; overflow: hidden;
         }
-        
         .pin-table th {
-            background: rgba(255, 121, 63, 0.1);
-            color: var(--accent);
-            text-align: left;
-            padding: 12px 15px;
-            border-bottom: 1px solid var(--glass-border);
+            background: rgba(255, 121, 63, 0.1); color: var(--accent);
+            text-align: left; padding: 12px 15px; border-bottom: 1px solid var(--glass-border);
         }
-        
-        .pin-table td {
-            padding: 12px 15px;
-            border-bottom: 1px solid rgba(255,255,255,0.05);
+        .pin-table td { padding: 12px 15px; border-bottom: 1px solid rgba(255,255,255,0.05); }
+        .pin-table tr:last-child td { border-bottom: none; }
+        .manual-step { display: flex; align-items: flex-start; height: 100%; }
+
+        /* --- VIRTUAL OLED SCREEN CSS --- */
+        .oled-bezel {
+            background: #1a1a1a; border: 2px solid #333; border-radius: 12px;
+            padding: 20px; width: 100%; max-width: 320px; margin: 0 auto;
+            box-shadow: inset 0 0 20px rgba(0,0,0,0.8), 0 10px 20px rgba(0,0,0,0.3);
+            display: flex; flex-direction: column; align-items: center;
         }
 
-        .pin-table tr:last-child td {
-            border-bottom: none;
+        .oled-screen {
+            background: #000; width: 256px; height: 128px;
+            border-radius: 4px; position: relative; overflow: hidden;
+            display: flex; flex-direction: column; border: 1px solid #222;
+            color: #fff; font-family: 'Courier New', Courier, monospace;
+            padding: 10px; box-shadow: 0 0 15px rgba(255, 121, 63, 0.1);
         }
+
+        .hw-button-container { margin-top: 25px; text-align: center; }
+        .hw-button {
+            background: #2d3436; border: 3px solid #555; width: 50px; height: 50px;
+            border-radius: 50%; cursor: pointer; display: inline-flex;
+            justify-content: center; align-items: center; color: #fff;
+            box-shadow: 0 6px 0 #111; transition: all 0.1s;
+        }
+        .hw-button:active, .hw-button.pressed {
+            transform: translateY(6px); box-shadow: 0 0 0 #111; 
+            background: var(--accent); border-color: #fff;
+        }
+
+        .os-header { font-size: 0.8rem; font-weight: bold; text-align: center; border-bottom: 1px solid #fff; padding-bottom: 4px; margin-bottom: 8px; text-transform: uppercase; }
+        .os-center { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; text-align: center;}
+        .os-menu-item { font-size: 0.8rem; padding: 3px 5px; margin-bottom: 2px; display: flex; align-items: center; }
+        .os-menu-item.active { background: #fff; color: #000; border-radius: 2px; }
+        .os-menu-item.active::before { content: '▶ '; font-size: 0.6rem; margin-right: 5px; }
         
-        .manual-step {
-            display: flex;
-            align-items: flex-start;
-            height: 100%;
-        }
+        .page-dots { position: absolute; bottom: 5px; width: 100%; text-align: center; font-size: 0.5rem; letter-spacing: 2px; color: #fff; left: 0;}
+
+        /* CSS OLED Eyes */
+        .home-eye-container { display: flex; justify-content: center; align-items: center; height: 100%; gap: 30px; width: 100%; position: absolute; top: 0; left: 0; }
+        .eye { width: 35px; height: 45px; background: #fff; border-radius: 50%; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+        .anim-idle .eye { animation: blink 4s infinite; }
+        .anim-left .eye { transform: translateX(-20px); }
+        .anim-right .eye { transform: translateX(20px); }
+        .anim-down .eye { transform: translateY(15px) scaleY(0.7); }
+        @keyframes blink { 0%, 46%, 48%, 52%, 100% { transform: scaleY(1); } 47%, 50% { transform: scaleY(0.1); } }
     </style>
 </head>
 <body>
 
-<div class="container max-w-4xl">
+<div class="container max-w-5xl">
     
     <div class="text-center mb-5">
         <h1 class="fw-bold"><span class="text-accent">OLO</span> Jiggler Installer</h1>
-        <p class="text-muted">BLE Mouse Jiggler with Display by Micromaker Labs</p>
+        <p class="text-muted">BLE Mouse Jiggler & Display by Micromaker Labs</p>
     </div>
 
-    <div class="row">
+    <!-- Top Full-Width Row: Installation Manual -->
+    <div class="row mb-4">
         <div class="col-12">
-            <div class="glass-card">
+            <div class="glass-card mb-0">
                 <h4 class="mb-4 text-white"><i class="fa-solid fa-book-open text-accent me-2"></i> Installation Manual</h4>
                 <div class="row g-4">
                     <div class="col-md-3">
                         <div class="manual-step">
                             <span class="step-number">1</span> 
-                            <div><strong>Connect Board:</strong><br><span class="text-muted small">Plug the ESP32-C3 Super Mini into your computer's USB port.</span></div>
+                            <div><strong>Connect Board:</strong><br><span class="text-muted small">Plug the ESP32-C3 Super Mini into your computer.</span></div>
                         </div>
                     </div>
                     <div class="col-md-3">
                         <div class="manual-step">
                             <span class="step-number">2</span> 
-                            <div><strong>Initialize:</strong><br><span class="text-muted small">Click the "Connect" button in the device panel below.</span></div>
+                            <div><strong>Initialize:</strong><br><span class="text-muted small">Click 'Connect' in the Firmware Flasher box below.</span></div>
                         </div>
                     </div>
                     <div class="col-md-3">
                         <div class="manual-step">
                             <span class="step-number">3</span> 
-                            <div><strong>Select Port:</strong><br><span class="text-muted small">In the browser popup, select the COM port labeled "USB Serial Device" or "CH343".</span></div>
+                            <div><strong>Select Port:</strong><br><span class="text-muted small">Select the COM port labeled "USB Serial Device" or "CH343".</span></div>
                         </div>
                     </div>
                     <div class="col-md-3">
                         <div class="manual-step">
                             <span class="step-number">4</span> 
-                            <div><strong>Install:</strong><br><span class="text-muted small">Click "Install OLO Jiggler". Wait ~60s until the success message appears.</span></div>
+                            <div><strong>Install:</strong><br><span class="text-muted small">Click Install. Wait ~60s until the success message appears.</span></div>
                         </div>
                     </div>
                 </div>
@@ -189,38 +166,50 @@
         </div>
     </div>
 
-    <div class="row">
-        <div class="col-md-5">
-            <div class="glass-card text-center h-100">
-                <h4 class="mb-3 text-white">Device Connection</h4>
-                <p class="small text-muted mb-4">Firmware Version: 1.0.0<br>Architecture: ESP32-C3 Super Mini</p>
+    <!-- Bottom Grid -->
+    <div class="row g-4">
+        
+        <!-- Left Column: Flasher & OS Simulator -->
+        <div class="col-lg-6">
+            <!-- Flasher -->
+            <div class="glass-card text-center mb-4" style="height: auto;">
+                <h5 class="mb-2 text-white"><i class="fa-solid fa-download text-accent me-2"></i> Firmware Flasher</h5>
+                <p class="small text-muted mb-4">Version: 1.0.0 | Board: ESP32-C3 Super Mini</p>
                 
-                <div class="d-flex justify-content-center mb-4">
+                <div class="d-flex justify-content-center mb-2">
                     <esp-web-install-button manifest="manifest.json"></esp-web-install-button>
                 </div>
-                
-                <button id="serial-btn" class="btn-serial w-100"><i class="fa-solid fa-plug me-2"></i>Connect Live Serial Monitor</button>
+                <p class="small text-muted mt-2 mb-0" id="flasher-status">Requires Web Serial API (Chrome/Edge)</p>
+            </div>
 
-                <div class="log-container text-start mt-4">
-                    <div class="log-header">
-                        <div><i class="fa-solid fa-terminal"></i> System Terminal</div>
-                        <i class="fa-solid fa-trash text-muted" id="clear-btn" style="cursor: pointer;" title="Clear Terminal"></i>
+            <!-- OS Simulator -->
+            <div class="glass-card text-center mb-0" style="height: auto;">
+                <h5 class="mb-3 text-white"><i class="fa-solid fa-microchip text-accent me-2"></i> Try The OLO OS</h5>
+                <p class="small text-muted mb-3"><strong>Tap:</strong> Scroll &nbsp;|&nbsp; <strong>Hold:</strong> Select &nbsp;|&nbsp; <strong>Double Tap:</strong> Action</p>
+                
+                <div class="oled-bezel">
+                    <div class="oled-screen" id="virtual-screen"></div>
+                    
+                    <div class="hw-button-container">
+                        <div class="hw-button" id="virtual-btn">
+                            <!-- Fingerprint icon to represent TTP233 Touch Sensor -->
+                            <i class="fa-solid fa-fingerprint fs-4"></i> 
+                        </div>
                     </div>
-                    <div class="log-content" id="terminal-output">> System initialized. Ready to connect...
-</div>
                 </div>
             </div>
         </div>
 
-        <div class="col-md-7">
-            <div class="glass-card h-100">
-                <h4 class="mb-3 text-white"><i class="fa-solid fa-microchip text-accent me-2"></i> Hardware & Wiring Guide</h4>
+        <!-- Right Column: Wiring Guide & Prerequisites -->
+        <div class="col-lg-6">
+            <div class="glass-card mb-0">
+                <h4 class="mb-3 text-white"><i class="fa-solid fa-bolt text-accent me-2"></i> Hardware & Wiring Guide</h4>
                 <div class="p-3 mb-3 rounded" style="background: rgba(255, 121, 63, 0.1); border: 1px solid var(--accent);">
-                    <strong><i class="fa-solid fa-triangle-exclamation text-accent me-1"></i> Important:</strong> This firmware is strictly compiled for the <strong>ESP32-C3 Super Mini</strong>. It will not work on standard ESP32 or ESP8266 boards.
+                    <strong><i class="fa-solid fa-triangle-exclamation text-accent me-1"></i> Important:</strong> This firmware is strictly compiled for the <strong>ESP32-C3 Super Mini</strong>.
                 </div>
                 
-                <p class="mb-2">Wire your components exactly as listed below before powering on the device:</p>
-                <table class="pin-table">
+                <p class="mb-2">Wire your components exactly as listed below:</p>
+                <table class="pin-table mb-4">
                     <thead>
                         <tr>
                             <th>Component</th>
@@ -228,29 +217,18 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <tr>
-                            <td>OLED SDA</td>
-                            <td>GPIO 20</td>
-                        </tr>
-                        <tr>
-                            <td>OLED SCL</td>
-                            <td>GPIO 21</td>
-                        </tr>
-                        <tr>
-                            <td>Passive Buzzer</td>
-                            <td>GPIO 2</td>
-                        </tr>
-                        <tr>
-                            <td>TTP233 Sensor</td>
-                            <td>GPIO 1</td>
-                        </tr>
+                        <tr><td>OLED SDA</td><td>GPIO 20</td></tr>
+                        <tr><td>OLED SCL</td><td>GPIO 21</td></tr>
+                        <tr><td>Passive Buzzer</td><td>GPIO 2</td></tr>
+                        <tr><td>TTP233 Sensor</td><td>GPIO 1</td></tr>
                     </tbody>
                 </table>
-                
+
                 <h5 class="text-white mt-4 mb-3">Prerequisites</h5>
-                <ul class="list-unstyled">
-                    <li class="mb-2"><i class="fa-brands fa-chrome text-accent me-2"></i> <strong>Browser:</strong> Chrome, Edge, Brave, or Opera on desktop.</li>
-                    <li class="mb-2"><i class="fa-solid fa-usb text-accent me-2"></i> <strong>Cable:</strong> A USB-C cable capable of data transfer.</li>
+                <ul class="list-unstyled mb-0">
+                    <li class="mb-3"><i class="fa-brands fa-chrome text-accent me-2"></i> <strong>Browser:</strong> Chrome, Edge, Brave, or Opera on a desktop computer. Safari and Firefox do not support Web Serial.</li>
+                    <li class="mb-3"><i class="fa-solid fa-usb text-accent me-2"></i> <strong>Cable:</strong> A USB-C cable capable of data transfer (not just a charging cable).</li>
+                    <li><i class="fa-brands fa-bluetooth-b text-accent me-2"></i> <strong>Connectivity:</strong> Your host computer must have Bluetooth enabled to connect to the Jiggler once installed.</li>
                 </ul>
             </div>
         </div>
@@ -258,80 +236,225 @@
 
 </div>
 
+<!-- Logic Scripts -->
 <script>
-    const terminal = document.getElementById('terminal-output');
-    const serialBtn = document.getElementById('serial-btn');
-    const clearBtn = document.getElementById('clear-btn');
-    const installButton = document.querySelector('esp-web-install-button');
+    // --- VIRTUAL OS LOGIC ---
+    const screen = document.getElementById('virtual-screen');
+    const btn = document.getElementById('virtual-btn');
 
-    // Helper to print to terminal
-    function logMsg(msg) {
-        terminal.textContent += `> ${msg}\n`;
-        terminal.scrollTop = terminal.scrollHeight;
+    let currentState = 'HOME'; 
+    let homePageIndex = 0;
+    const MAX_HOME_PAGES = 4; // 0=Jiggler, 1=Pomodoro, 2=Habit, 3=Pet Eyes
+    
+    let menuSelection = 0;
+    let menuScroll = 0;
+    
+    const menus = {
+        main: [
+            "Mode: SLOW", "Screensaver: 30s", "Anim Delay: 5s", "Sleep Timer: OFF", 
+            "Sound: ON", "Invert Disp: OFF", "Page Anim: Slide", "Quote Mode", 
+            "Games...", "Reset Tracker", "Reset EEPROM", "Back"
+        ],
+        games: ["Flappy Block", "Dino Run", "Reaction Test", "Back"]
+    };
+
+    let pomoActive = false;
+    let habitCount = 0;
+    let eyeAnimClass = 'anim-idle';
+
+    function renderScreen() {
+        if (currentState === 'HOME') {
+            let dots = ['○','○','○','○'];
+            dots[homePageIndex] = '●';
+
+            if (homePageIndex === 0) {
+                screen.innerHTML = `
+                    <div class="os-header border-0 mb-0">Bluetooth: Paired</div>
+                    <div class="os-center">
+                        <h3 class="m-0 fw-bold">JIGGLING</h3>
+                        <div style="font-size: 0.7rem; margin-top:5px;">Mode: SLOW</div>
+                    </div>
+                    <div class="page-dots">${dots.join('')}</div>
+                `;
+            } else if (homePageIndex === 1) {
+                screen.innerHTML = `
+                    <div class="os-header">POMODORO TIMER</div>
+                    <div class="os-center">
+                        <h2 class="m-0 fw-bold">25:00</h2>
+                        <div style="font-size: 0.6rem; margin-top:5px;">${pomoActive ? 'WORK SPRINT' : 'Double Tap to Start'}</div>
+                    </div>
+                    <div class="page-dots">${dots.join('')}</div>
+                `;
+            } else if (homePageIndex === 2) {
+                screen.innerHTML = `
+                    <div class="os-header">DAILY TRACKER</div>
+                    <div class="os-center">
+                        <h1 class="m-0 fw-bold">${habitCount}</h1>
+                        <div style="font-size: 0.6rem;">Double Tap to Add</div>
+                    </div>
+                    <div class="page-dots">${dots.join('')}</div>
+                `;
+            } else if (homePageIndex === 3) {
+                screen.innerHTML = `
+                    <div class="home-eye-container ${eyeAnimClass}" id="pet-eyes">
+                        <div class="eye left"></div>
+                        <div class="eye right"></div>
+                    </div>
+                    <div class="page-dots">${dots.join('')}</div>
+                `;
+            }
+        } 
+        else if (currentState === 'MAIN_MENU' || currentState === 'GAMES_MENU') {
+            const isMain = currentState === 'MAIN_MENU';
+            const title = isMain ? "SETTINGS" : "-- GAMES --";
+            const items = isMain ? menus.main : menus.games;
+            
+            // Bulletproof scrolling logic (shows 4 items max at a time)
+            if (menuSelection >= menuScroll + 4) {
+                menuScroll = menuSelection - 3;
+            } else if (menuSelection < menuScroll) {
+                menuScroll = menuSelection;
+            }
+
+            let listHTML = '';
+            for (let i = menuScroll; i < Math.min(items.length, menuScroll + 4); i++) {
+                const active = i === menuSelection ? 'active' : '';
+                listHTML += `<div class="os-menu-item ${active}">${items[i]}</div>`;
+            }
+
+            screen.innerHTML = `
+                <div class="os-header">${title}</div>
+                <div style="flex-grow:1; display:flex; flex-direction:column; gap:2px; z-index: 10;">${listHTML}</div>
+            `;
+        }
     }
 
-    // Clear Terminal
-    clearBtn.addEventListener('click', () => {
-        terminal.textContent = '';
-    });
+    // --- BUTTON PRESS LOGIC ---
+    let pressTimer;
+    let tapCount = 0;
+    let waitingForDoubleTap = false;
+    let doubleTapTimer;
+    let isLongPress = false;
 
-    // 1. Hook into ESP Web Tools Flasher Events
+    function handlePressStart(e) {
+        if(e && e.cancelable) e.preventDefault();
+        btn.classList.add('pressed');
+        isLongPress = false;
+        clearTimeout(pressTimer);
+        
+        pressTimer = setTimeout(() => {
+            isLongPress = true;
+            actionLongPress();
+            btn.classList.remove('pressed'); 
+        }, 500);
+    }
+
+    function handlePressEnd(e) {
+        if(e && e.cancelable) e.preventDefault();
+        btn.classList.remove('pressed');
+        clearTimeout(pressTimer);
+        
+        if (!isLongPress) {
+            tapCount++;
+            waitingForDoubleTap = true;
+            clearTimeout(doubleTapTimer);
+            
+            doubleTapTimer = setTimeout(() => {
+                if (tapCount === 1) actionSingleTap();
+                else if (tapCount >= 2) actionDoubleTap();
+                
+                tapCount = 0;
+                waitingForDoubleTap = false;
+            }, 250);
+        }
+    }
+
+    btn.addEventListener('mousedown', (e) => { if(e.button === 0) handlePressStart(e); });
+    btn.addEventListener('mouseup', (e) => { if(e.button === 0) handlePressEnd(e); });
+    btn.addEventListener('touchstart', handlePressStart, {passive: false});
+    btn.addEventListener('touchend', handlePressEnd, {passive: false});
+
+    // --- OS ACTIONS ---
+    function actionSingleTap() {
+        if (currentState === 'HOME') {
+            homePageIndex = (homePageIndex + 1) % MAX_HOME_PAGES;
+            eyeAnimClass = 'anim-idle'; 
+        } else if (currentState === 'MAIN_MENU') {
+            menuSelection = (menuSelection + 1) % menus.main.length;
+        } else if (currentState === 'GAMES_MENU') {
+            menuSelection = (menuSelection + 1) % menus.games.length;
+        }
+        renderScreen();
+    }
+
+    function actionDoubleTap() {
+        if (currentState === 'HOME') {
+            if (homePageIndex === 1) pomoActive = !pomoActive;
+            else if (homePageIndex === 2) habitCount++;
+            else if (homePageIndex === 3) {
+                const anims = ['anim-left', 'anim-right', 'anim-down'];
+                eyeAnimClass = anims[Math.floor(Math.random() * anims.length)];
+                setTimeout(() => {
+                    if(currentState === 'HOME' && homePageIndex === 3) {
+                        eyeAnimClass = 'anim-idle';
+                        renderScreen();
+                    }
+                }, 2000);
+            }
+        }
+        renderScreen();
+    }
+
+    function actionLongPress() {
+        if (currentState === 'HOME') {
+            currentState = 'MAIN_MENU';
+            menuSelection = 0;
+            menuScroll = 0;
+        } else if (currentState === 'MAIN_MENU') {
+            const selected = menus.main[menuSelection];
+            if (selected === "Back") {
+                currentState = 'HOME';
+                homePageIndex = 0;
+            } else if (selected === "Games...") {
+                currentState = 'GAMES_MENU';
+                menuSelection = 0;
+                menuScroll = 0;
+            } else {
+                screen.style.opacity = '0.5';
+                setTimeout(() => screen.style.opacity = '1', 150);
+            }
+        } else if (currentState === 'GAMES_MENU') {
+            const selected = menus.games[menuSelection];
+            if (selected === "Back") {
+                currentState = 'MAIN_MENU';
+                // Find "Games..." index
+                menuSelection = menus.main.indexOf("Games..."); 
+                if (menuSelection >= menuScroll + 4) menuScroll = menuSelection - 3;
+            } else {
+                screen.innerHTML = `<div class="os-center fw-bold">LOADING GAME...</div>`;
+                setTimeout(() => renderScreen(), 800);
+                return;
+            }
+        }
+        renderScreen();
+    }
+
+    renderScreen();
+
+    // --- FLASHER LOGIC ---
+    const installButton = document.querySelector('esp-web-install-button');
+    const statusText = document.getElementById('flasher-status');
+
     installButton.addEventListener('state-changed', (e) => {
-        // ESP Web Tools States: 0: Idle, 1: Connecting, 2: Connected, 3: Initializing, 4: Flashing, 5: Finished, 6: Error
-        const stateMessages = [
-            "Idle", 
-            "Connecting to board...", 
-            "Connected successfully.", 
-            "Initializing flasher...", 
-            "Flashing firmware (Do not disconnect)...", 
-            "Flash Complete! Device is rebooting.", 
-            "Error occurred."
-        ];
-        logMsg(`[Flasher] ${stateMessages[e.detail.state] || "State: " + e.detail.state}`);
+        const states = ["Idle", "Connecting...", "Connected.", "Initializing...", "Flashing...", "Success! Rebooting.", "Error."];
+        statusText.innerText = `Status: ${states[e.detail.state] || e.detail.state}`;
+        if(e.detail.state === 4) statusText.style.color = "var(--accent)";
+        if(e.detail.state === 5) statusText.style.color = "#2ecc71";
     });
 
     installButton.addEventListener('error', (e) => {
-        logMsg(`[Flasher Error] ${e.detail.message}`);
-    });
-
-    // 2. Real-Time Web Serial Monitor Logic
-    serialBtn.addEventListener('click', async () => {
-        if (!("serial" in navigator)) {
-            logMsg("[Error] Web Serial API is not supported in this browser.");
-            return;
-        }
-
-        try {
-            logMsg("[Serial] Requesting port access...");
-            const port = await navigator.serial.requestPort();
-            
-            // Standard baud rate for ESP32-C3 is 115200
-            await port.open({ baudRate: 115200 });
-            logMsg("[Serial] Connected at 115200 baud. Waiting for logs...\n-----------------------------------");
-            
-            serialBtn.innerHTML = '<i class="fa-solid fa-plug-circle-check me-2"></i>Serial Connected';
-            serialBtn.style.background = 'var(--accent)';
-            serialBtn.style.color = '#fff';
-
-            const decoder = new TextDecoderStream();
-            port.readable.pipeTo(decoder.writable);
-            const reader = decoder.readable.getReader();
-
-            // Stream data indefinitely
-            while (true) {
-                const { value, done } = await reader.read();
-                if (done) break;
-                if (value) {
-                    terminal.textContent += value;
-                    terminal.scrollTop = terminal.scrollHeight; // Auto-scroll
-                }
-            }
-        } catch (error) {
-            logMsg(`[Serial Error] ${error.message}`);
-            serialBtn.innerHTML = '<i class="fa-solid fa-plug me-2"></i>Connect Live Serial Monitor';
-            serialBtn.style.background = 'transparent';
-            serialBtn.style.color = 'var(--accent)';
-        }
+        statusText.innerText = `Error: ${e.detail.message}`;
+        statusText.style.color = "#ff5252";
     });
 </script>
 
