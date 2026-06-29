@@ -104,11 +104,11 @@
             background: var(--accent); border-color: #fff;
         }
 
-        .os-header { font-size: 0.8rem; font-weight: bold; text-align: center; border-bottom: 1px solid #fff; padding-bottom: 4px; margin-bottom: 8px; text-transform: uppercase; }
+        .os-header { font-size: 0.72rem; font-weight: bold; text-align: center; border-bottom: 1px solid #fff; padding-bottom: 2px; margin-bottom: 4px; text-transform: uppercase; }
         .os-center { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; text-align: center;}
-        .os-menu-item { font-size: 0.8rem; padding: 3px 5px; margin-bottom: 2px; display: flex; align-items: center; }
+        .os-menu-item { font-size: 0.72rem; padding: 2px 4px; margin-bottom: 1px; display: flex; align-items: center; line-height: 1.2; }
         .os-menu-item.active { background: #fff; color: #000; border-radius: 2px; }
-        .os-menu-item.active::before { content: '▶ '; font-size: 0.6rem; margin-right: 5px; }
+        .os-menu-item.active::before { content: '▶ '; font-size: 0.55rem; margin-right: 5px; }
         
         .page-dots { position: absolute; bottom: 5px; width: 100%; text-align: center; font-size: 0.5rem; letter-spacing: 2px; color: #fff; left: 0;}
 
@@ -120,18 +120,80 @@
         .anim-right .eye { transform: translateX(20px); }
         .anim-down .eye { transform: translateY(15px) scaleY(0.7); }
         @keyframes blink { 0%, 46%, 48%, 52%, 100% { transform: scaleY(1); } 47%, 50% { transform: scaleY(0.1); } }
+
+        /* Custom Accent Buttons */
+        .btn-outline-accent {
+            color: var(--accent);
+            border-color: var(--accent);
+            background: transparent;
+            transition: all 0.2s ease-in-out;
+        }
+        .btn-outline-accent:hover {
+            color: #fff;
+            background-color: var(--accent-hover);
+            border-color: var(--accent-hover);
+        }
+        .btn-outline-accent.active, .btn-outline-accent:active {
+            color: #fff !important;
+            background-color: var(--accent) !important;
+            border-color: var(--accent) !important;
+            box-shadow: 0 0 10px rgba(255, 121, 63, 0.4);
+        }
+
+        /* --- TABS LAYOUT CUSTOM STYLING --- */
+        .nav-tabs {
+            border-bottom: 2px solid var(--glass-border) !important;
+        }
+        .nav-tabs .nav-link {
+            color: #d1d8e0 !important;
+            border: none !important;
+            padding: 12px 24px;
+            font-weight: 600;
+            background: transparent !important;
+            transition: all 0.2s ease-in-out;
+        }
+        .nav-tabs .nav-link:hover {
+            color: var(--accent) !important;
+        }
+        .nav-tabs .nav-link.active {
+            color: #fff !important;
+            border: none !important;
+            border-bottom: 3px solid var(--accent) !important;
+            box-shadow: 0 4px 10px -4px rgba(255, 121, 63, 0.4);
+        }
+        .pointer-events-none {
+            pointer-events: none;
+        }
     </style>
 </head>
 <body>
 
 <div class="container max-w-5xl">
     
-    <div class="text-center mb-5">
+    <div class="text-center mb-4">
         <h1 class="fw-bold"><span class="text-accent">OLO</span> Jiggler Installer</h1>
-        <p class="text-muted">BLE Mouse Jiggler With Display by Micromaker Labs</p>
+        <p class="text-muted mb-0">BLE Mouse Jiggler With Display by Micromaker Labs</p>
     </div>
 
-    <!-- Top Full-Width Row: Installation Manual -->
+    <!-- Tab Navigation -->
+    <ul class="nav nav-tabs justify-content-center mb-4" id="jigglerTabs" role="tablist">
+        <li class="nav-item" role="presentation">
+            <button class="nav-link active" id="flasher-tab" data-bs-toggle="tab" data-bs-target="#flasher-pane" type="button" role="tab" aria-controls="flasher-pane" aria-selected="true">
+                <i class="fa-solid fa-download me-1"></i> Firmware Installer
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="controller-tab" data-bs-toggle="tab" data-bs-target="#controller-pane" type="button" role="tab" aria-controls="controller-pane" aria-selected="false">
+                <i class="fa-solid fa-gamepad me-1"></i> Device Controller
+            </button>
+        </li>
+    </ul>
+
+    <!-- Tab Content -->
+    <div class="tab-content" id="jigglerTabsContent">
+        <!-- Tab 1: Flasher Pane -->
+        <div class="tab-pane fade show active" id="flasher-pane" role="tabpanel" aria-labelledby="flasher-tab">
+            <!-- Top Full-Width Row: Installation Manual -->
     <div class="row mb-4">
         <div class="col-12">
             <div class="glass-card mb-0">
@@ -174,10 +236,23 @@
             <!-- Flasher -->
             <div class="glass-card text-center mb-4" style="height: auto;">
                 <h5 class="mb-2 text-white"><i class="fa-solid fa-download text-accent me-2"></i> Firmware Flasher</h5>
-                <p class="small text-muted mb-4">Version: 1.0.0 | Board: ESP32-C3 Super Mini</p>
+                <p class="small text-muted mb-3">Version: 1.0.0 | Board: ESP32-C3 Super Mini</p>
                 
+                <!-- Display Selector Buttons -->
+                <div class="mb-4 px-3 text-start">
+                    <label class="form-label text-muted small fw-bold mb-2 d-block text-center">SELECT OLED DISPLAY TYPE</label>
+                    <div class="btn-group w-100" role="group" aria-label="OLED Screen Type Selection">
+                        <button type="button" class="btn btn-outline-accent w-50 py-2 active" id="btn-ssd1306" onclick="selectDisplay('ssd1306')">
+                            <i class="fa-solid fa-mobile-screen-button me-1"></i> <strong>0.96" OLED</strong><br><span class="small opacity-75">SSD1306</span>
+                        </button>
+                        <button type="button" class="btn btn-outline-accent w-50 py-2" id="btn-sh110x" onclick="selectDisplay('sh110x')">
+                            <i class="fa-solid fa-desktop me-1"></i> <strong>1.3" OLED</strong><br><span class="small opacity-75">SH110X</span>
+                        </button>
+                    </div>
+                </div>
+
                 <div class="d-flex justify-content-center mb-2">
-                    <esp-web-install-button manifest="manifest.json"></esp-web-install-button>
+                    <esp-web-install-button id="install-btn" manifest="manifest_ssd1306.json"></esp-web-install-button>
                 </div>
                 <p class="small text-muted mt-2 mb-0" id="flasher-status">Requires Web Serial API (Chrome/Edge)</p>
             </div>
@@ -217,8 +292,8 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <tr><td>0.96inch OLED SDA</td><td>GPIO 20</td></tr>
-                        <tr><td>0.96inch OLED SCL</td><td>GPIO 21</td></tr>
+                        <tr><td id="oled-sda-label">0.96" OLED SDA</td><td>GPIO 20</td></tr>
+                        <tr><td id="oled-scl-label">0.96" OLED SCL</td><td>GPIO 21</td></tr>
                         <tr><td>Passive Buzzer</td><td>GPIO 2</td></tr>
                         <tr><td>TTP233 Sensor</td><td>GPIO 1</td></tr>
                     </tbody>
@@ -233,8 +308,216 @@
             </div>
         </div>
     </div>
+        </div> <!-- End of flasher-pane -->
+        
+        <!-- Tab 2: Controller Pane -->
+        <div class="tab-pane fade" id="controller-pane" role="tabpanel" aria-labelledby="controller-tab">
+            <div class="row g-4">
+                <!-- Column 1: Connection & Navigation & Controls -->
+                <div class="col-lg-6">
+                    <!-- Serial Connect -->
+                    <div class="glass-card p-4 mb-4" style="height: auto;">
+                        <h5 class="mb-3 text-white"><i class="fa-solid fa-plug text-accent me-2"></i> Connection Control</h5>
+                        <p class="small text-muted mb-3">Connect your OLO Jiggler via USB serial to control it from the web browser.</p>
+                        <button id="btn-serial-connect" class="btn btn-outline-accent w-100 py-3 mb-2">
+                            <i class="fa-solid fa-link me-2"></i> <strong>Connect Device</strong>
+                        </button>
+                        <div class="d-flex justify-content-between align-items-center mt-3 px-1">
+                            <span class="small text-muted">Serial Port Status:</span>
+                            <span id="serial-status-badge" class="badge bg-danger px-3 py-2">DISCONNECTED</span>
+                        </div>
+                    </div>
 
-</div>
+                    <!-- Jump To Pages -->
+                    <div class="glass-card p-4 mb-4" style="height: auto;">
+                        <h5 class="mb-3 text-white"><i class="fa-solid fa-rocket text-accent me-2"></i> Page Quick Jump</h5>
+                        <p class="small text-muted mb-3">Jump immediately to any screen page on your device's display.</p>
+                        <div class="row g-2" id="page-jump-container">
+                            <div class="col-6"><button class="btn btn-outline-accent w-100 py-2 btn-page-jump disabled" data-page="0">0. Mouse Jiggler</button></div>
+                            <div class="col-6"><button class="btn btn-outline-accent w-100 py-2 btn-page-jump disabled" data-page="1">1. System Stats</button></div>
+                            <div class="col-6"><button class="btn btn-outline-accent w-100 py-2 btn-page-jump disabled" data-page="2">2. Daily Quote</button></div>
+                            <div class="col-6"><button class="btn btn-outline-accent w-100 py-2 btn-page-jump disabled" data-page="3">3. CPU Temp</button></div>
+                            <div class="col-6"><button class="btn btn-outline-accent w-100 py-2 btn-page-jump disabled" data-page="4">4. Pomodoro</button></div>
+                            <div class="col-6"><button class="btn btn-outline-accent w-100 py-2 btn-page-jump disabled" data-page="5">5. Eye Animation</button></div>
+                            <div class="col-6"><button class="btn btn-outline-accent w-100 py-2 btn-page-jump disabled" data-page="6">6. Habit Tracker</button></div>
+                            <div class="col-6"><button class="btn btn-outline-accent w-100 py-2 btn-page-jump disabled" data-page="7" id="btn-clock-page">7. Sync Clock</button></div>
+                        </div>
+                    </div>
+
+                    <!-- Quick controls -->
+                    <div class="glass-card p-4 mb-0" style="height: auto;">
+                        <h5 class="mb-3 text-white"><i class="fa-solid fa-sliders text-accent me-2"></i> Device Controls</h5>
+                        <div class="mb-3">
+                            <label class="form-label text-muted small fw-bold mb-2">Jiggle Mode</label>
+                            <div class="row g-2">
+                                <div class="col-4"><button class="btn btn-outline-accent btn-sm w-100 btn-jiggle-mode disabled" data-mode="0">NONE</button></div>
+                                <div class="col-4"><button class="btn btn-outline-accent btn-sm w-100 btn-jiggle-mode disabled" data-mode="1">SLOW</button></div>
+                                <div class="col-4"><button class="btn btn-outline-accent btn-sm w-100 btn-jiggle-mode disabled" data-mode="2">FAST</button></div>
+                                <div class="col-4"><button class="btn btn-outline-accent btn-sm w-100 btn-jiggle-mode disabled" data-mode="3">ZIGZAG</button></div>
+                                <div class="col-4"><button class="btn btn-outline-accent btn-sm w-100 btn-jiggle-mode disabled" data-mode="4">SQUARE</button></div>
+                                <div class="col-4"><button class="btn btn-outline-accent btn-sm w-100 btn-jiggle-mode disabled" data-mode="5">WAVE</button></div>
+                            </div>
+                        </div>
+                        <hr style="border-color: rgba(255,255,255,0.1);">
+                        <div class="row g-3">
+                            <div class="col-6">
+                                <div class="form-check form-switch pt-2">
+                                    <input class="form-check-input" type="checkbox" role="switch" id="toggle-sound" disabled>
+                                    <label class="form-check-label text-white small" for="toggle-sound">Beep Sound</label>
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="form-check form-switch pt-2">
+                                    <input class="form-check-input" type="checkbox" role="switch" id="toggle-invert" disabled>
+                                    <label class="form-check-label text-white small" for="toggle-invert">Invert OLED</label>
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <button class="btn btn-outline-secondary btn-sm w-100 disabled" id="btn-play-tone"><i class="fa-solid fa-volume-high me-1"></i> Play Tone</button>
+                            </div>
+                            <div class="col-6">
+                                <button class="btn btn-outline-secondary btn-sm w-100 disabled" id="btn-reset-tracker"><i class="fa-solid fa-rotate-left me-1"></i> Reset Tracker</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Column 2: Clock Sync & LED settings & Pins config & Terminal -->
+                <div class="col-lg-6">
+                    <!-- Clock Time Sync -->
+                    <div class="glass-card p-4 mb-4" style="height: auto;">
+                        <h5 class="mb-3 text-white"><i class="fa-solid fa-clock text-accent me-2"></i> Time Sync Options</h5>
+                        <div class="row g-3 align-items-center mb-3">
+                            <div class="col-md-6">
+                                <div class="form-check form-switch">
+                                    <input class="form-check-input" type="checkbox" role="switch" id="toggle-auto-sync" checked disabled>
+                                    <label class="form-check-label text-white small" for="toggle-auto-sync">Auto Time Sync</label>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <button class="btn btn-outline-accent btn-sm w-100 disabled" id="btn-sync-now"><i class="fa-solid fa-sync me-1"></i> Sync Now</button>
+                            </div>
+                        </div>
+                        <div class="mb-0">
+                            <label class="form-label text-muted small fw-bold mb-2">Timezone Offset</label>
+                            <select id="select-timezone" class="form-select bg-dark text-white border-secondary small" disabled>
+                                <option value="0">Local Host Time (Default)</option>
+                                <option value="-12">UTC-12:00</option>
+                                <option value="-11">UTC-11:00</option>
+                                <option value="-10">UTC-10:00</option>
+                                <option value="-9">UTC-09:00</option>
+                                <option value="-8">UTC-08:00 (PST)</option>
+                                <option value="-7">UTC-07:00 (MST)</option>
+                                <option value="-6">UTC-06:00 (CST)</option>
+                                <option value="-5">UTC-05:00 (EST)</option>
+                                <option value="-4">UTC-04:00</option>
+                                <option value="-3">UTC-03:00</option>
+                                <option value="-2">UTC-02:00</option>
+                                <option value="-1">UTC-01:00</option>
+                                <option value="0">UTC+00:00 (GMT/WET)</option>
+                                <option value="1">UTC+01:00 (CET)</option>
+                                <option value="2">UTC+02:00 (EET)</option>
+                                <option value="3">UTC+03:00 (MSK)</option>
+                                <option value="4">UTC+04:00 (GST)</option>
+                                <option value="5">UTC+05:00</option>
+                                <option value="5.5">UTC+05:30 (IST)</option>
+                                <option value="6">UTC+06:00</option>
+                                <option value="7">UTC+07:00 (WIB)</option>
+                                <option value="8">UTC+08:00 (CST/SGT)</option>
+                                <option value="9">UTC+09:00 (JST)</option>
+                                <option value="10">UTC+10:00 (AEST)</option>
+                                <option value="11">UTC+11:00</option>
+                                <option value="12">UTC+12:00 (NZST)</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- LED Effects -->
+                    <div class="glass-card p-4 mb-4" style="height: auto;">
+                        <h5 class="mb-3 text-white"><i class="fa-solid fa-lightbulb text-accent me-2"></i> WS2812B Status LED</h5>
+                        <div class="form-check form-switch mb-3">
+                            <input class="form-check-input" type="checkbox" role="switch" id="toggle-led-bypass" disabled>
+                            <label class="form-check-label text-white small" for="toggle-led-bypass">Bypass Mode Actions (Custom Color/Effect)</label>
+                        </div>
+                        <div id="led-control-group" class="opacity-50 pointer-events-none">
+                            <div class="mb-3">
+                                <label class="form-label text-muted small fw-bold mb-2">Bypass LED Effect</label>
+                                <select id="select-led-effect" class="form-select bg-dark text-white border-secondary small" disabled>
+                                    <option value="0">Solid Color</option>
+                                    <option value="1">Rainbow Gradient</option>
+                                    <option value="2">Breathing Pulse</option>
+                                    <option value="3">Strobe Flash</option>
+                                    <option value="4">Always OFF</option>
+                                </select>
+                            </div>
+                            <div class="mb-2">
+                                <div class="d-flex justify-content-between">
+                                    <label class="form-label text-danger small fw-bold mb-1">Red Channel</label>
+                                    <span id="val-r" class="small text-muted">255</span>
+                                </div>
+                                <input type="range" class="form-range" min="0" max="255" value="255" id="slider-r" disabled>
+                            </div>
+                            <div class="mb-2">
+                                <div class="d-flex justify-content-between">
+                                    <label class="form-label text-success small fw-bold mb-1">Green Channel</label>
+                                    <span id="val-g" class="small text-muted">120</span>
+                                </div>
+                                <input type="range" class="form-range" min="0" max="255" value="120" id="slider-g" disabled>
+                            </div>
+                            <div class="mb-2">
+                                <div class="d-flex justify-content-between">
+                                    <label class="form-label text-info small fw-bold mb-1">Blue Channel</label>
+                                    <span id="val-b" class="small text-muted">0</span>
+                                </div>
+                                <input type="range" class="form-range" min="0" max="255" value="0" id="slider-b" disabled>
+                            </div>
+                            <div class="p-2 rounded text-center small text-white mt-3" id="led-preview" style="background: rgb(255,120,0); text-shadow: 0 1px 2px rgba(0,0,0,0.8); border:1px solid rgba(255,255,255,0.2);">
+                                WS2812B Dynamic Color Output
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Pin Configuration & Hardware Settings -->
+                    <div class="glass-card p-4 mb-4" style="height: auto;">
+                        <h5 class="mb-3 text-white"><i class="fa-solid fa-gears text-accent me-2"></i> Pin Out Configuration</h5>
+                        <p class="small text-muted mb-3">Reconfigure hardware pins dynamically. Saving reboots the device instantly.</p>
+                        <div class="row g-2 mb-3">
+                            <div class="col-6 col-md-4">
+                                <label class="form-label text-muted small fw-bold mb-1">I2C SDA Pin</label>
+                                <input type="number" id="pin-sda" class="form-control form-control-sm bg-dark text-white border-secondary text-center" value="20" min="0" max="30" disabled>
+                            </div>
+                            <div class="col-6 col-md-4">
+                                <label class="form-label text-muted small fw-bold mb-1">I2C SCL Pin</label>
+                                <input type="number" id="pin-scl" class="form-control form-control-sm bg-dark text-white border-secondary text-center" value="21" min="0" max="30" disabled>
+                            </div>
+                            <div class="col-6 col-md-4">
+                                <label class="form-label text-muted small fw-bold mb-1">Button/Touch</label>
+                                <input type="number" id="pin-btn" class="form-control form-control-sm bg-dark text-white border-secondary text-center" value="1" min="0" max="30" disabled>
+                            </div>
+                            <div class="col-6">
+                                <label class="form-label text-muted small fw-bold mb-1">Passive Buzzer</label>
+                                <input type="number" id="pin-buzzer" class="form-control form-control-sm bg-dark text-white border-secondary text-center" value="2" min="0" max="30" disabled>
+                            </div>
+                            <div class="col-6">
+                                <label class="form-label text-muted small fw-bold mb-1">WS2812B LED</label>
+                                <input type="number" id="pin-neopixel" class="form-control form-control-sm bg-dark text-white border-secondary text-center" value="6" min="0" max="30" disabled>
+                            </div>
+                        </div>
+                        <button class="btn btn-outline-danger btn-sm w-100 py-2" id="btn-save-pins" disabled><i class="fa-solid fa-floppy-disk me-1"></i> Save Custom Pins & Reboot</button>
+                    </div>
+
+                    <!-- Retro Console log -->
+                    <div class="glass-card p-4 mb-0" style="height: auto;">
+                        <h5 class="mb-2 text-white"><i class="fa-solid fa-terminal text-accent me-2"></i> Serial Event Log</h5>
+                        <div id="serial-console" class="bg-black text-success p-3 rounded" style="height: 120px; font-family: monospace; font-size: 0.72rem; overflow-y: auto; border: 1px solid #333;">
+                            [SYSTEM] Wait for connection...
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div> <!-- End of controller-pane -->
+    </div> <!-- End of jigglerTabsContent -->
+</div> <!-- End of container -->
 
 <!-- Logic Scripts -->
 <script>
@@ -441,22 +724,487 @@
 
     renderScreen();
 
+    // --- DISPLAY SELECTION LOGIC ---
+    function selectDisplay(type) {
+        const btnSsd = document.getElementById('btn-ssd1306');
+        const btnSh = document.getElementById('btn-sh110x');
+        const installBtn = document.getElementById('install-btn');
+        const sdaLabel = document.getElementById('oled-sda-label');
+        const sclLabel = document.getElementById('oled-scl-label');
+        
+        if (type === 'ssd1306') {
+            if (btnSsd) btnSsd.classList.add('active');
+            if (btnSh) btnSh.classList.remove('active');
+            if (installBtn) installBtn.setAttribute('manifest', 'manifest_ssd1306.json');
+            if (sdaLabel) sdaLabel.innerText = '0.96" OLED SDA';
+            if (sclLabel) sclLabel.innerText = '0.96" OLED SCL';
+        } else {
+            if (btnSh) btnSh.classList.add('active');
+            if (btnSsd) btnSsd.classList.remove('active');
+            if (installBtn) installBtn.setAttribute('manifest', 'manifest_sh110x.json');
+            if (sdaLabel) sdaLabel.innerText = '1.3" OLED SDA';
+            if (sclLabel) sclLabel.innerText = '1.3" OLED SCL';
+        }
+    }
+
     // --- FLASHER LOGIC ---
     const installButton = document.querySelector('esp-web-install-button');
     const statusText = document.getElementById('flasher-status');
 
-    installButton.addEventListener('state-changed', (e) => {
-        const states = ["Idle", "Connecting...", "Connected.", "Initializing...", "Flashing...", "Success! Rebooting.", "Error."];
-        statusText.innerText = `Status: ${states[e.detail.state] || e.detail.state}`;
-        if(e.detail.state === 4) statusText.style.color = "var(--accent)";
-        if(e.detail.state === 5) statusText.style.color = "#2ecc71";
+    if (installButton) {
+        installButton.addEventListener('state-changed', (e) => {
+            const states = ["Idle", "Connecting...", "Connected.", "Initializing...", "Flashing...", "Success! Rebooting.", "Error."];
+            if (statusText) {
+                statusText.innerText = `Status: ${states[e.detail.state] || e.detail.state}`;
+                if(e.detail.state === 4) statusText.style.color = "var(--accent)";
+                if(e.detail.state === 5) statusText.style.color = "#2ecc71";
+            }
+        });
+
+        installButton.addEventListener('error', (e) => {
+            if (statusText) {
+                statusText.innerText = `Error: ${e.detail.message}`;
+                statusText.style.color = "#ff5252";
+            }
+        });
+    }
+
+    // --- WEB SERIAL DEVICE CONTROLLER LOGIC ---
+    let port = null;
+    let reader = null;
+    let writeStream = null;
+    let isConnected = false;
+    let serialLogBuffer = [];
+
+    const btnConnect = document.getElementById('btn-serial-connect');
+    const badgeStatus = document.getElementById('serial-status-badge');
+    const logConsole = document.getElementById('serial-console');
+
+    // Controls to enable/disable
+    const pageJumpButtons = document.querySelectorAll('.btn-page-jump');
+    const jiggleButtons = document.querySelectorAll('.btn-jiggle-mode');
+    const soundSwitch = document.getElementById('toggle-sound');
+    const invertSwitch = document.getElementById('toggle-invert');
+    const playToneBtn = document.getElementById('btn-play-tone');
+    const resetTrackerBtn = document.getElementById('btn-reset-tracker');
+    const autoSyncSwitch = document.getElementById('toggle-auto-sync');
+    const syncNowBtn = document.getElementById('btn-sync-now');
+    const timezoneSelect = document.getElementById('select-timezone');
+    const ledBypassSwitch = document.getElementById('toggle-led-bypass');
+    const ledEffectSelect = document.getElementById('select-led-effect');
+    const sliderR = document.getElementById('slider-r');
+    const sliderG = document.getElementById('slider-g');
+    const sliderB = document.getElementById('slider-b');
+    const valR = document.getElementById('val-r');
+    const valG = document.getElementById('val-g');
+    const valB = document.getElementById('val-b');
+    const ledPreview = document.getElementById('led-preview');
+    const ledControlGroup = document.getElementById('led-control-group');
+    const pinSdaInput = document.getElementById('pin-sda');
+    const pinSclInput = document.getElementById('pin-scl');
+    const pinBtnInput = document.getElementById('pin-btn');
+    const pinBuzzerInput = document.getElementById('pin-buzzer');
+    const pinNeoInput = document.getElementById('pin-neopixel');
+    const savePinsBtn = document.getElementById('btn-save-pins');
+
+    function logToConsole(text, type = 'SYSTEM') {
+        const timestamp = new Date().toLocaleTimeString();
+        const prefix = `[${timestamp}] [${type}] `;
+        const line = prefix + text;
+        serialLogBuffer.push(line);
+        if (serialLogBuffer.length > 50) serialLogBuffer.shift();
+        logConsole.innerText = serialLogBuffer.join('\n');
+        logConsole.scrollTop = logConsole.scrollHeight;
+    }
+
+    function setControlsEnabled(enabled) {
+        pageJumpButtons.forEach(b => {
+            if (b.id === 'btn-clock-page') {
+                if (enabled) b.classList.remove('disabled');
+                else b.classList.add('disabled');
+            } else {
+                b.disabled = !enabled;
+                if (enabled) b.classList.remove('disabled');
+                else b.classList.add('disabled');
+            }
+        });
+        jiggleButtons.forEach(b => b.disabled = !enabled);
+        soundSwitch.disabled = !enabled;
+        invertSwitch.disabled = !enabled;
+        playToneBtn.disabled = !enabled;
+        resetTrackerBtn.disabled = !enabled;
+        autoSyncSwitch.disabled = !enabled;
+        syncNowBtn.disabled = !enabled;
+        timezoneSelect.disabled = !enabled;
+        ledBypassSwitch.disabled = !enabled;
+        pinSdaInput.disabled = !enabled;
+        pinSclInput.disabled = !enabled;
+        pinBtnInput.disabled = !enabled;
+        pinBuzzerInput.disabled = !enabled;
+        pinNeoInput.disabled = !enabled;
+        savePinsBtn.disabled = !enabled;
+
+        // If bypass is active, keep its sub-controls enabled
+        updateLedControlGroupState(enabled && ledBypassSwitch.checked);
+    }
+
+    function updateLedControlGroupState(bypassActive) {
+        ledEffectSelect.disabled = !bypassActive;
+        sliderR.disabled = !bypassActive;
+        sliderG.disabled = !bypassActive;
+        sliderB.disabled = !bypassActive;
+        if (bypassActive) {
+            ledControlGroup.classList.remove('opacity-50', 'pointer-events-none');
+        } else {
+            ledControlGroup.classList.add('opacity-50', 'pointer-events-none');
+        }
+    }
+
+    async function sendCommand(command) {
+        if (!isConnected || !writeStream) return;
+        try {
+            const encoder = new TextEncoder();
+            const writer = writeStream.getWriter();
+            await writer.write(encoder.encode(command + '\n'));
+            writer.releaseLock();
+            logToConsole(command, 'TX');
+        } catch (err) {
+            logToConsole(`Send error: ${err.message}`, 'ERROR');
+        }
+    }
+
+    async function connectSerial() {
+        if (!("serial" in navigator)) {
+            alert("Web Serial API is not supported in this browser. Please use Chrome or Edge.");
+            return;
+        }
+
+        try {
+            port = await navigator.serial.requestPort();
+            await port.open({ baudRate: 115200 });
+            
+            isConnected = true;
+            btnConnect.innerHTML = `<i class="fa-solid fa-unlink me-2"></i> <strong>Disconnect</strong>`;
+            btnConnect.classList.remove('btn-outline-accent');
+            btnConnect.classList.add('btn-danger');
+            badgeStatus.innerText = 'CONNECTED';
+            badgeStatus.classList.remove('bg-danger');
+            badgeStatus.classList.add('bg-success');
+            
+            writeStream = port.writable;
+            setControlsEnabled(true);
+            logToConsole("Connected to port successfully.");
+            
+            // Periodically ping to request status
+            sendCommand("PING");
+            
+            // Start read loop
+            readSerialData();
+        } catch (err) {
+            logToConsole(`Connection failed: ${err.message}`, 'ERROR');
+        }
+    }
+
+    async function disconnectSerial() {
+        isConnected = false;
+        if (reader) {
+            try {
+                await reader.cancel();
+            } catch(e){}
+        }
+        if (port) {
+            try {
+                await port.close();
+            } catch(e){}
+        }
+        
+        port = null;
+        reader = null;
+        writeStream = null;
+        
+        btnConnect.innerHTML = `<i class="fa-solid fa-link me-2"></i> <strong>Connect Device</strong>`;
+        btnConnect.classList.remove('btn-danger');
+        btnConnect.classList.add('btn-outline-accent');
+        badgeStatus.innerText = 'DISCONNECTED';
+        badgeStatus.classList.remove('bg-success');
+        badgeStatus.classList.add('bg-danger');
+        
+        setControlsEnabled(false);
+        logToConsole("Disconnected.");
+    }
+
+    btnConnect.addEventListener('click', () => {
+        if (isConnected) disconnectSerial();
+        else connectSerial();
     });
 
-    installButton.addEventListener('error', (e) => {
-        statusText.innerText = `Error: ${e.detail.message}`;
-        statusText.style.color = "#ff5252";
+    async function readSerialData() {
+        while (port && port.readable && isConnected) {
+            try {
+                reader = port.readable.getReader();
+                let buffer = "";
+                while (true) {
+                    const { value, done } = await reader.read();
+                    if (done) {
+                        break;
+                    }
+                    if (value) {
+                        const chunk = new TextDecoder().decode(value);
+                        buffer += chunk;
+                        let lines = buffer.split("\n");
+                        buffer = lines.pop(); // keep partial last line
+                        for (let line of lines) {
+                            line = line.trim();
+                            if (line) {
+                                parseIncomingLine(line);
+                            }
+                        }
+                    }
+                }
+            } catch (err) {
+                logToConsole(`Read error: ${err.message}`, 'ERROR');
+                break;
+            } finally {
+                if (reader) {
+                    reader.releaseLock();
+                }
+            }
+        }
+        if (isConnected) {
+            disconnectSerial();
+        }
+    }
+
+    function parseIncomingLine(line) {
+        logToConsole(line, 'RX');
+        
+        if (line.startsWith("STATUS:")) {
+            const parts = line.substring(7).split(":");
+            let page = null;
+            let jiggle = null;
+            let sound = null;
+            let invert = null;
+            let timeStr = null;
+            let pinsStr = null;
+            let ledStr = null;
+
+            for (let i = 0; i < parts.length; i += 2) {
+                const key = parts[i];
+                const val = parts[i+1];
+                if (key === "PAGE") page = parseInt(val);
+                else if (key === "JIGGLE") jiggle = parseInt(val);
+                else if (key === "SOUND") sound = parseInt(val);
+                else if (key === "INVERT") invert = parseInt(val);
+                else if (key === "TIME") timeStr = val;
+                else if (key === "PINS") pinsStr = val;
+                else if (key === "LED") ledStr = val;
+            }
+
+            if (page !== null) {
+                document.querySelectorAll('.btn-page-jump').forEach(b => {
+                    if (parseInt(b.getAttribute('data-page')) === page) {
+                        b.classList.add('active');
+                    } else {
+                        b.classList.remove('active');
+                    }
+                });
+            }
+
+            if (jiggle !== null) {
+                document.querySelectorAll('.btn-jiggle-mode').forEach(b => {
+                    if (parseInt(b.getAttribute('data-mode')) === jiggle) {
+                        b.classList.add('active');
+                    } else {
+                        b.classList.remove('active');
+                    }
+                });
+            }
+
+            if (sound !== null) {
+                soundSwitch.checked = (sound !== 0);
+            }
+
+            if (invert !== null) {
+                invertSwitch.checked = (invert !== 0);
+            }
+
+            if (pinsStr !== null) {
+                const p = pinsStr.split(",");
+                if (p.length === 5) {
+                    pinBtnInput.value = p[0];
+                    pinBuzzerInput.value = p[1];
+                    pinNeoInput.value = p[2];
+                    pinSdaInput.value = p[3];
+                    pinSclInput.value = p[4];
+                }
+            }
+
+            if (ledStr !== null) {
+                const l = ledStr.split(",");
+                if (l.length === 5) {
+                    const bypass = (parseInt(l[0]) !== 0);
+                    ledBypassSwitch.checked = bypass;
+                    updateLedControlGroupState(isConnected && bypass);
+                    
+                    ledEffectSelect.value = l[1];
+                    
+                    sliderR.value = l[2]; valR.innerText = l[2];
+                    sliderG.value = l[3]; valG.innerText = l[3];
+                    sliderB.value = l[4]; valB.innerText = l[4];
+                    
+                    updateLedPreviewColor();
+                }
+            }
+        }
+    }
+
+    // Quick Jumps
+    document.querySelectorAll('.btn-page-jump').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const page = btn.getAttribute('data-page');
+            sendCommand(`SET_PAGE:${page}`);
+        });
     });
+
+    // Jiggle Modes
+    document.querySelectorAll('.btn-jiggle-mode').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const mode = btn.getAttribute('data-mode');
+            sendCommand(`SET_JIGGLE:${mode}`);
+        });
+    });
+
+    // Sound toggle
+    soundSwitch.addEventListener('change', () => {
+        sendCommand(`SET_SOUND:${soundSwitch.checked ? 1 : 0}`);
+    });
+
+    // Invert toggle
+    invertSwitch.addEventListener('change', () => {
+        sendCommand(`SET_INVERT:${invertSwitch.checked ? 1 : 0}`);
+    });
+
+    // Play Tone
+    playToneBtn.addEventListener('click', () => {
+        sendCommand("PLAY_TONE");
+    });
+
+    // Reset Tracker
+    resetTrackerBtn.addEventListener('click', () => {
+        if (confirm("Reset daily counter tracker to 0?")) {
+            sendCommand("RESET_TRACKER");
+        }
+    });
+
+    // Save Pin Out
+    savePinsBtn.addEventListener('click', () => {
+        const btnPin = pinBtnInput.value;
+        const buzPin = pinBuzzerInput.value;
+        const neoPin = pinNeoInput.value;
+        const sdaPin = pinSdaInput.value;
+        const sclPin = pinSclInput.value;
+        if (confirm(`Save pins and reboot device?\n\nButton: GPIO ${btnPin}\nBuzzer: GPIO ${buzPin}\nLED: GPIO ${neoPin}\nSDA: GPIO ${sdaPin}\nSCL: GPIO ${sclPin}`)) {
+            sendCommand(`SET_PINS:${btnPin},${buzPin},${neoPin},${sdaPin},${sclPin}`);
+        }
+    });
+
+    // Led bypass and controls
+    ledBypassSwitch.addEventListener('change', () => {
+        updateLedControlGroupState(isConnected && ledBypassSwitch.checked);
+        sendLedState();
+    });
+
+    ledEffectSelect.addEventListener('change', () => {
+        sendLedState();
+    });
+
+    function sendLedState() {
+        const by = ledBypassSwitch.checked ? 1 : 0;
+        const eff = ledEffectSelect.value;
+        const r = sliderR.value;
+        const g = sliderG.value;
+        const b = sliderB.value;
+        sendCommand(`SET_LED:${by},${eff},${r},${g},${b}`);
+        updateLedPreviewColor();
+    }
+
+    function updateLedPreviewColor() {
+        const r = sliderR.value;
+        const g = sliderG.value;
+        const b = sliderB.value;
+        ledPreview.style.background = `rgb(${r}, ${g}, ${b})`;
+    }
+
+    // Sliders input event throttling
+    let ledSendTimeout = null;
+    function throttleLedSend() {
+        if (ledSendTimeout) clearTimeout(ledSendTimeout);
+        updateLedPreviewColor();
+        valR.innerText = sliderR.value;
+        valG.innerText = sliderG.value;
+        valB.innerText = sliderB.value;
+        ledSendTimeout = setTimeout(() => {
+            sendLedState();
+        }, 100);
+    }
+    sliderR.addEventListener('input', throttleLedSend);
+    sliderG.addEventListener('input', throttleLedSend);
+    sliderB.addEventListener('input', throttleLedSend);
+
+    function getFormattedTime() {
+        let tz = parseFloat(timezoneSelect.value);
+        if (tz === 0) {
+            // Use local host timezone offset in hours
+            tz = -new Date().getTimezoneOffset() / 60;
+        }
+        let date = new Date();
+        const utc = date.getTime() + (date.getTimezoneOffset() * 60000);
+        date = new Date(utc + (3600000 * tz));
+        let hours = date.getHours();
+        const minutes = String(date.getMinutes()).padStart(2, '0');
+        const seconds = String(date.getSeconds()).padStart(2, '0');
+        const ampm = hours >= 12 ? 'PM' : 'AM';
+        hours = hours % 12;
+        hours = hours ? hours : 12; // 0 should be 12
+        return `${String(hours).padStart(2, '0')}:${minutes}:${seconds} ${ampm}`;
+    }
+
+    function getGmtString() {
+        const val = parseFloat(timezoneSelect.value);
+        let finalVal = val;
+        if (val === 0) {
+            finalVal = -new Date().getTimezoneOffset() / 60;
+        }
+        if (finalVal === 0) return "GMT+00:00";
+        const sign = finalVal > 0 ? "+" : "-";
+        const absVal = Math.abs(finalVal);
+        const hours = Math.floor(absVal);
+        const mins = Math.round((absVal - hours) * 60);
+        return `GMT${sign}${String(hours).padStart(2, '0')}:${String(mins).padStart(2, '0')}`;
+    }
+
+    syncNowBtn.addEventListener('click', () => {
+        const tStr = getFormattedTime();
+        const tzStr = getGmtString();
+        sendCommand(`SYNC_TIME:${tStr} ${tzStr}`);
+    });
+
+    let lastSentTimeStr = "";
+    setInterval(() => {
+        if (isConnected && autoSyncSwitch.checked) {
+            const currentT = getFormattedTime();
+            const tzStr = getGmtString();
+            const fullCmd = `${currentT} ${tzStr}`;
+            if (fullCmd !== lastSentTimeStr) {
+                lastSentTimeStr = fullCmd;
+                sendCommand(`SYNC_TIME:${fullCmd}`);
+            }
+        }
+    }, 1000);
+
 </script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/js/bootstrap.bundle.min.js"></script>
 
 </body>
 </html>

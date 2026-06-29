@@ -1,0 +1,15 @@
+{
+  "name": "OLO Jiggler (SSD1306)",
+  "version": "1.0.0",
+  "home_assistant_domain": "esphome",
+  "builds": [
+    {
+      "chipFamily": "ESP32-C3",
+      "parts": [
+        { "path": "bootloader.bin", "offset": 0 },
+        { "path": "partitions.bin", "offset": 32768 },
+        { "path": "firmware_ssd1306.bin", "offset": 65536 }
+      ]
+    }
+  ]
+}
