@@ -1,46 +1,90 @@
-# OLO Jiggler (By Micromaker Labs)
+# OLO Jiggler Firmware — Readme
 
-A sleek, productivity-focused desk companion and Web Serial Controller built on the **ESP32-C3 Super Mini**. Designed by Micromaker Labs, the OLO Jiggler acts as a Bluetooth Low Energy (BLE) mouse jiggler to keep your workstation active, while also serving as a Pomodoro timer, habit tracker, interactive desk pet, and synchronized desktop clock.
-
----
-
-## ✨ Features
-
-- **📶 Dual-Purpose Web Tool (`index.html`)**:
-  - **Firmware Installer**: Flash SSD1306 (Small) or SH110X (Big) firmware directly from the browser using WebUSB.
-  - **Device Controller**: Control the Jiggler in real-time via Web Serial (jump to pages, toggle modes, play buzzer tones, trigger habit tracker resets, and send automated clock sync commands).
-- **🖱️ BLE Mouse Jiggler**: Undetectable wireless jiggler with multiple movement behaviors: Slow, Fast, Zigzag, Square, and Wave modes.
-- **🕒 Background Clock Sync**: Syncs host PC time in the background (including timezone offsets). A minimalistic Clock screen is automatically displayed on the device when a USB serial connection is active.
-- **🌈 WS2812B Status NeoPixel**: Capped strictly at **50% brightness** to prevent damage. Color-coded animations flash/breathe dynamically based on the active jiggle mode. Includes override options for custom Solid, Rainbow, Breathe, Strobe, or Off effects.
-- **🛠️ Dynamic Pins Configuration**: Customize hardware pins (SDA, SCL, Touch, Buzzer, NeoPixel) dynamically from the Web Controller. Saves directly to device preferences and reboots instantly.
-- **🎮 Built-in Retro Games**: Flappy Block, Dino Run, and Reaction Test.
-- **📚 Productivity Suite & Diagnostics**: Pomodoro timer (25/5 split), 100 focus quotes, daily habit tracker, and live CPU/RAM temperature tracking graphs.
+Welcome to the official user manual for the **OLO Jiggler** firmware. This firmware transforms your ESP32-C3 development board into an advanced Bluetooth Low Energy (BLE) Mouse Jiggler and multi-utility companion device with a gorgeous OLED display interface.
 
 ---
 
-## 🔌 Default Hardware Pins
+## ⚡ Key Features
 
-Pins are reconfigurable, but defaults are loaded as:
-
-| Component | Default GPIO Pin |
-| :--- | :--- |
-| **OLED SDA** | GPIO 20 |
-| **OLED SCL** | GPIO 21 |
-| **Touch Button** | GPIO 1 |
-| **Passive Buzzer** | GPIO 2 |
-| **WS2812B LED** | GPIO 6 |
-
----
-
-## 📦 Installation & Flashing
-
-Connect your ESP32-C3 SuperMini to your computer via a data-capable USB-C cable and visit the [**Web Installer & Controller**](index.html) to flash the firmware and manage settings directly.
+1. **BLE Mouse Jiggler** — Keeps your computer awake and active using wireless Bluetooth mouse movements. Supports multiple movement patterns:
+   - **SLOW**: Subtle, random movements every 60 seconds.
+   - **FAST**: Small movements every second.
+   - **ZIGZAG / SQUARE / WAVE**: Continuous, automated shapes for visual validation.
+2. **Pomodoro Focus Timer** — On-device work sprint timer (25 minutes focus, 5 minutes break) to help you stay productive.
+3. **Daily Habit Tracker** — Keep track of tasks or daily habits with a simple counter.
+4. **Daily Quote Mode** — Access a library of 100 motivational and developer-focused quotes.
+5. **On-Device Games** — Play retro games built specifically for the 128x64 display (Flappy Block, Dino Run, Reaction Test).
+6. **WS2812B Status LED Control** (Big version only) — Custom breathing, rainbow, strobe, and solid color status indications.
+7. **Web Controller Interface** — Configure settings, sync time, and monitor status from your Google Chrome or Microsoft Edge browser.
 
 ---
 
-## 🛠️ Authors & Credits
+## 🔧 Installation & Flashing Guide
 
-Developed by **Micromaker Labs**.
-- ESP32-BLE-Mouse by T-vK
-- Adafruit SH110X & SSD1306 Libraries
-- U8g2_for_Adafruit_GFX
+To flash this firmware to your OLO Bit or ESP32-C3 dev board:
+
+1. Connect the board to your computer using a USB-C data cable.
+2. Open the **OLO Jiggler Installer** (`index.html`) in Google Chrome or Microsoft Edge.
+3. Select your display hardware type:
+   - **0.96" OLED (SSD1306)** for the Small display version.
+   - **1.3" OLED (SH110X)** for the Big display version.
+4. Click **Connect & Flash** (or **Install**).
+5. A browser popup will show the available COM ports. Select your board (usually labeled *USB Serial Device* or *CH343/CP2102*).
+6. Follow the on-screen instructions. The installation takes about 60 seconds. Once completed, the board will reboot into the OLO Jiggler software.
+
+---
+
+## 🕹️ Hardware Controls & Navigation
+
+The OLO Jiggler is operated entirely via a single button or touch sensor connected to the board (default is GPIO 1).
+
+### Basic Button Gestures
+* **Single Tap**: Scroll through menu items or rotate home screen pages.
+* **Double Tap**: Perform an action on the active page (e.g. start/pause Pomodoro timer, increment Habit counter, make the pet eyes look around).
+* **Long Press (Hold for >0.6s)**: Select / Enter a menu, toggle settings, or enter/exit the main settings screen.
+
+### Navigation Flow
+1. **Home Pages**: Rotate through home pages (Mouse Jiggler status, System Stats, Daily Quote, CPU Temperature, Pomodoro Timer, Pet Eye Animation, Habit Tracker) with a **Single Tap**.
+2. **Open Settings**: From any Home page, **Long Press** the button to enter the **Settings Menu**.
+3. **Settings Navigation**:
+   - **Single Tap** to scroll down the menu list.
+   - **Long Press** to change the value of the selected setting or enter a sub-menu.
+   - To go back, scroll to the **Back** item at the bottom of the list and **Long Press**, or perform a **Long Press** from the menu.
+
+---
+
+## ⚙️ On-Device Settings
+
+Settings are re-ordered by use cases (most used items first) to make navigation quick and intuitive:
+
+* **Mode**: Toggle the Jiggling pattern (`OFF`, `SLOW`, `FAST`, `ZIGZAG`, `SQUARE`, `WAVE`).
+* **Jiggler Timer**: Set an auto-stop countdown for the mouse jiggler. Choose from `30m`, `1h`, `2h`, `3h`, `4h`, or `Never` (runs indefinitely).
+* **Games...**: Select and play built-in retro games.
+* **Quote Mode**: Display rotating motivational focus quotes.
+* **LED Setup...** (Big version only): Customize status LED behaviors (solid color, rainbow, strobe, breathe, or always off).
+* **Animation Timer**: Adjust the delay before the display enters the interactive Eye Animations screensaver. Choose from `1m`, `5m`, `10m`, `15m`, `30m`, `1h`, or `Never`.
+* **Anim. Delay**: Adjust how frequently screensaver eyes perform looking or blinking motions.
+* **Page Anim**: Select transition style between screens (`SLIDE H`, `SLIDE V`, `NONE`).
+* **Sound**: Toggle general buzzer beep alerts `ON`/`OFF`.
+* **Anim Sound**: Toggle chirp sounds specifically during eye animations `ON`/`OFF`.
+* **Invert Disp**: Invert display colors for comfortable night viewing.
+* **Reset Tracker**: Reset daily Habit Tracker count back to 0.
+* **Factory Reset**: Clears all saved settings from the board's memory and reboots.
+
+---
+
+## ⚡ Web Controller Usage
+
+Connect the Jiggler to your computer via USB and open the Web Controller (`index.html`) to configure it wirelessly or over serial.
+
+### Setup and Connection
+1. Click **⚡ Connect via USB Serial** on the landing page.
+2. Select your device port and click **Connect**.
+3. Once connected, the interface will automatically sync your system time and unlock the controller dashboard.
+
+### Dashboard Tabs
+* **⚡ Controller**: Adjust the active Jiggler mode, trigger jump commands to change pages instantly, play buzzer test tones, trigger habit tracker resets, and sync timezone settings.
+* **⚙️ Settings**:
+  - **General Preferences**: Toggle sound alerts, screensaver eye chirps, display inversion, page slide animations, and active animation timers.
+  - **Bluetooth Identity**: Change your device's Bluetooth broadcast name and manufacturer details (default: `"OLO Bit"`, `"Micromaker Labs"`). Changing details saves to memory and restarts the device with a brand-new connection ID so host computers recognize it as a new device.
+* **⚡ Flasher**: Re-flash or upgrade the board firmware directly from the web browser.
