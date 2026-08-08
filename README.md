@@ -1,90 +1,90 @@
-# OLO Jiggler Firmware — Readme
+# OLO Jiggler — User Manual & Operating Guide
 
-Welcome to the official user manual for the **OLO Jiggler** firmware. This firmware transforms your ESP32-C3 development board into an advanced Bluetooth Low Energy (BLE) Mouse Jiggler and multi-utility companion device with a gorgeous OLED display interface.
+Welcome to the official user manual for **OLO Jiggler** by Micromaker Labs. This guide explains all end-user features, touch gesture controls, menu navigation, display configuration, and Web Controller usage.
 
 ---
 
 ## ⚡ Key Features
 
-1. **BLE Mouse Jiggler** — Keeps your computer awake and active using wireless Bluetooth mouse movements. Supports multiple movement patterns:
-   - **SLOW**: Subtle, random movements every 60 seconds.
-   - **FAST**: Small movements every second.
-   - **ZIGZAG / SQUARE / WAVE**: Continuous, automated shapes for visual validation.
-2. **Pomodoro Focus Timer** — On-device work sprint timer (25 minutes focus, 5 minutes break) to help you stay productive.
-3. **Daily Habit Tracker** — Keep track of tasks or daily habits with a simple counter.
-4. **Daily Quote Mode** — Access a library of 100 motivational and developer-focused quotes.
-5. **On-Device Games** — Play retro games built specifically for the 128x64 display (Flappy Block, Dino Run, Reaction Test).
-6. **WS2812B Status LED Control** (Big version only) — Custom breathing, rainbow, strobe, and solid color status indications.
-7. **Web Controller Interface** — Configure settings, sync time, and monitor status from your Google Chrome or Microsoft Edge browser.
+1. **🖱️ BLE Mouse Jiggler**: Keeps host computers awake over Bluetooth Low Energy with multiple movement patterns:
+   - **SLOW**: Subtle movement every 60 seconds (stealthy & undetectable).
+   - **FAST**: Micro movements every second.
+   - **ZIGZAG / SQUARE / WAVE**: Continuous geometric movement shapes for visual verification.
+2. **⏱️ Jiggler Auto-Stop Timer**: Automatically stops mouse movement after a set duration (`30m`, `1h`, `2h`, `3h`, `4h`, or `Never`).
+3. **📺 NVS Display Type Selection**: Choose between **SH110X (1.3" OLED)** and **SSD1306 (0.96" OLED)** display types directly from the Web Controller or Serial commands. Settings save to NVS preferences across reboots.
+4. **🔌 Customizable Pinouts**: Remap hardware GPIO pins (I2C SDA, I2C SCL, Touch Button, Buzzer, NeoPixel LED) wirelessly or over USB Serial. Saved directly to NVS memory.
+5. **💡 Smart NeoPixel Status LED**: Color-coded lighting indications (capped at 50% brightness for hardware protection). Auto-disabled when SSD1306 display type is selected.
+6. **📱 Borderless OS UI & Touch Dot**: Clean borderless interface with a small touch indicator dot at the bottom right corner `(x=125, y=61)` whenever input touch/press is active.
+7. **⏱️ Productivity & Utility Suite**:
+   - **Pomodoro Timer**: 25-minute work sprint and 5-minute break cycle.
+   - **Daily Habit Tracker**: Track daily habits or task counters on screen.
+   - **Daily Focus Quotes**: 100 motivational quotes for developers and makers.
+   - **CPU & RAM Diagnostics**: Live real-time temperature tracking graphs.
+8. **🎮 Built-in Retro Games**: Flappy Block, Dino Run, and Reaction Test.
 
 ---
 
-## 🔧 Installation & Flashing Guide
+## 🕹️ Hardware Touch Controls & Gestures
 
-To flash this firmware to your OLO Bit or ESP32-C3 dev board:
+OLO Jiggler is controlled via a single touch sensor or physical button on the dev board:
 
-1. Connect the board to your computer using a USB-C data cable.
-2. Open the **OLO Jiggler Installer** (`index.html`) in Google Chrome or Microsoft Edge.
-3. Select your display hardware type:
-   - **0.96" OLED (SSD1306)** for the Small display version.
-   - **1.3" OLED (SH110X)** for the Big display version.
-4. Click **Connect & Flash** (or **Install**).
-5. A browser popup will show the available COM ports. Select your board (usually labeled *USB Serial Device* or *CH343/CP2102*).
-6. Follow the on-screen instructions. The installation takes about 60 seconds. Once completed, the board will reboot into the OLO Jiggler software.
+| Touch Gesture | Action |
+|---|---|
+| **Single Tap** | Scroll down menu items or cycle through Home Screen pages. |
+| **Double Tap** | Perform active page action (Start/Pause Pomodoro, increment Habit counter, trigger eye animation motions). |
+| **Long Press (>0.6s)** | Enter/Select a menu item, toggle a setting value, or return back to Home Screen. |
 
----
-
-## 🕹️ Hardware Controls & Navigation
-
-The OLO Jiggler is operated entirely via a single button or touch sensor connected to the board (default is GPIO 1).
-
-### Basic Button Gestures
-* **Single Tap**: Scroll through menu items or rotate home screen pages.
-* **Double Tap**: Perform an action on the active page (e.g. start/pause Pomodoro timer, increment Habit counter, make the pet eyes look around).
-* **Long Press (Hold for >0.6s)**: Select / Enter a menu, toggle settings, or enter/exit the main settings screen.
-
-### Navigation Flow
-1. **Home Pages**: Rotate through home pages (Mouse Jiggler status, System Stats, Daily Quote, CPU Temperature, Pomodoro Timer, Pet Eye Animation, Habit Tracker) with a **Single Tap**.
-2. **Open Settings**: From any Home page, **Long Press** the button to enter the **Settings Menu**.
-3. **Settings Navigation**:
-   - **Single Tap** to scroll down the menu list.
-   - **Long Press** to change the value of the selected setting or enter a sub-menu.
-   - To go back, scroll to the **Back** item at the bottom of the list and **Long Press**, or perform a **Long Press** from the menu.
+> [!TIP]
+> Whenever a touch or button press is registered, a small **touch dot** lights up in the bottom-right corner `(x=125, y=61)` of the display.
 
 ---
 
-## ⚙️ On-Device Settings
+## 🌐 Web Controller Guide (`index.html`)
 
-Settings are re-ordered by use cases (most used items first) to make navigation quick and intuitive:
+Open `index.html` in any Web Serial compatible browser (**Google Chrome** or **Microsoft Edge**) and click **🔌 Connect via USB Serial**.
 
-* **Mode**: Toggle the Jiggling pattern (`OFF`, `SLOW`, `FAST`, `ZIGZAG`, `SQUARE`, `WAVE`).
-* **Jiggler Timer**: Set an auto-stop countdown for the mouse jiggler. Choose from `30m`, `1h`, `2h`, `3h`, `4h`, or `Never` (runs indefinitely).
-* **Games...**: Select and play built-in retro games.
-* **Quote Mode**: Display rotating motivational focus quotes.
-* **LED Setup...** (Big version only): Customize status LED behaviors (solid color, rainbow, strobe, breathe, or always off).
-* **Animation Timer**: Adjust the delay before the display enters the interactive Eye Animations screensaver. Choose from `1m`, `5m`, `10m`, `15m`, `30m`, `1h`, or `Never`.
-* **Anim. Delay**: Adjust how frequently screensaver eyes perform looking or blinking motions.
-* **Page Anim**: Select transition style between screens (`SLIDE H`, `SLIDE V`, `NONE`).
-* **Sound**: Toggle general buzzer beep alerts `ON`/`OFF`.
-* **Anim Sound**: Toggle chirp sounds specifically during eye animations `ON`/`OFF`.
-* **Invert Disp**: Invert display colors for comfortable night viewing.
-* **Reset Tracker**: Reset daily Habit Tracker count back to 0.
-* **Factory Reset**: Clears all saved settings from the board's memory and reboots.
+### Dashboard Tabs Overview
+
+1. **⚡ Jiggler Controls**:
+   - Instantly switch active Jiggle Mode (`NONE`, `SLOW`, `FAST`, `ZIGZAG`, `SQUARE`, `WAVE`).
+   - Quick jump buttons (0 to 7) to open any display page remotely.
+   - Play buzzer test tones and reset the habit tracker.
+2. **⚙️ Settings & Pins**:
+   - **Display Type Selection**: Switch between `SH110X (1.3" OLED)` and `SSD1306 (0.96" OLED)`. Saves to NVS preferences and reboots the board cleanly.
+   - **Hardware GPIO Pinouts**: Remap I2C SDA, I2C SCL, Button, Buzzer, and NeoPixel pins.
+   - **System Preferences**: Toggle general audio beeps, eye animation chirps, display color inversion, and page slide transition animations (`SLIDE H`, `SLIDE V`, `NONE`).
+3. **🌐 BLE & Timers**:
+   - **Bluetooth Identity**: Change BLE device broadcast name (default: `"OLO Bit"`) and manufacturer details (default: `"Micromaker Labs"`). Automatically re-calculates host MAC address offsets so host PCs treat it as a brand-new device.
+   - **Timers**: Set Screensaver activation timeout, Jiggler auto-stop timer, and Eye animation delays.
+   - **Clock Sync**: Enable automatic background time sync or force manual RTC sync with custom timezone offsets.
+4. **💡 NeoPixel LED**:
+   - Configure override lighting effects (`Solid Color`, `Rainbow Cycle`, `Breathing Pulse`, `Strobe Flash`, or `Always OFF`).
+   - Drag Red, Green, and Blue sliders with real-time color preview box.
+   - *Note: Automatically disabled when SSD1306 display type is selected.*
+5. **🔧 Web Flasher**:
+   - Flash pre-compiled firmware binaries directly to your ESP32-C3 board over USB without installing Python or command-line tools.
+6. **💻 Serial Event Console**:
+   - Monitor real-time RX/TX command logs, status payloads, and hardware diagnostic messages.
 
 ---
 
-## ⚡ Web Controller Usage
+## 🔧 Flashing & Firmware Upgrade
 
-Connect the Jiggler to your computer via USB and open the Web Controller (`index.html`) to configure it wirelessly or over serial.
+1. Connect your ESP32-C3 board to your computer using a data USB-C cable.
+2. Open `index.html` in Google Chrome or MS Edge.
+3. On the landing page or **Web Flasher** tab, choose your display target:
+   - **SH110X** for 1.3" displays with NeoPixel status LED.
+   - **SSD1306** for 0.96" compact displays.
+4. Click **Install OLO Jiggler Firmware** (or **Connect & Flash**).
+5. Select your COM port from the browser pop-up. If unrecognised, hold the physical **BOOT** button on the board while plugging in the USB cable.
 
-### Setup and Connection
-1. Click **⚡ Connect via USB Serial** on the landing page.
-2. Select your device port and click **Connect**.
-3. Once connected, the interface will automatically sync your system time and unlock the controller dashboard.
+---
 
-### Dashboard Tabs
-* **⚡ Controller**: Adjust the active Jiggler mode, trigger jump commands to change pages instantly, play buzzer test tones, trigger habit tracker resets, and sync timezone settings.
-* **⚙️ Settings**:
-  - **General Preferences**: Toggle sound alerts, screensaver eye chirps, display inversion, page slide animations, and active animation timers.
-  - **Bluetooth Identity**: Change your device's Bluetooth broadcast name and manufacturer details (default: `"OLO Bit"`, `"Micromaker Labs"`). Changing details saves to memory and restarts the device with a brand-new connection ID so host computers recognize it as a new device.
-* **⚡ Flasher**: Re-flash or upgrade the board firmware directly from the web browser.
+## ❓ Frequently Asked Questions (FAQ)
+
+- **Q: How do I know if touch input is working?**  
+  A: Look at the bottom-right corner of the OLED display — a tiny touch indicator dot appears whenever touch input is active.
+- **Q: Can I change display hardware without re-flashing?**  
+  A: Yes! Open the Web Controller, go to **Settings & Pins**, select your Display Type (`SH110X` or `SSD1306`), and click Save. The setting will save to NVS preferences and reboot the board.
+- **Q: How do I pair OLO Jiggler with a new computer?**  
+  A: Change the BLE Device Name or Manufacturer in the **BLE & Timers** tab. The firmware computes a unique MAC address offset upon reboot so your computer sees it as a brand-new Bluetooth device.

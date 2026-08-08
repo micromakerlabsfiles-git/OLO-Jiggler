@@ -2,54 +2,37 @@
 <html lang="en">
 
 <head>
-  <meta charset="UTF-8">
-  <title>OLO Jiggler — Advanced BLE Mouse Jiggler</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>OLO Jiggler — Web Controller & Firmware Flasher | Micromaker Labs</title>
+  <meta name="description"
+    content="OLO Jiggler Web Controller & Flasher: BLE Mouse Jiggler controls, NVS display type & pinout settings, real-time clock sync, and Web Serial flasher." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link
-    href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=Roboto+Mono:wght@400;500&display=swap"
-    rel="stylesheet">
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap"
+    rel="stylesheet" />
   <script type="module" src="https://unpkg.com/esp-web-tools@10/dist/web/install-button.js?module"></script>
+
   <style>
-    html {
-      scrollbar-gutter: stable;
-    }
-
-    /* ── Dark Theme (default) ─────────────────────────────────────── */
     :root {
-      --bg: #060608;
-      --panel: rgba(18, 18, 24, 0.85);
-      --border: rgba(255, 106, 0, 0.18);
-      --primary: #ff6a00;
-      --primary-hover: #e05d00;
-      --accent: #ff9d00;
-      --text: #fdfdfd;
-      --text2: #a0a2ad;
-      --success: #10b981;
-      --danger: #ef4444;
-      --active-tab: #2d1808;
-      --header-bg: rgba(6, 6, 8, 0.85);
-      --input-bg: #111115;
-      --card-hover: rgba(255,106,0,0.03);
-      --code-bg: rgba(255,255,255,0.04);
-    }
-
-    /* ── Light Theme ─────────────────────────────────────────────── */
-    [data-theme="light"] {
-      --bg: #f4f4f6;
-      --panel: rgba(255, 255, 255, 0.92);
-      --border: rgba(255, 106, 0, 0.22);
-      --primary: #d95e00;
-      --primary-hover: #bf5200;
-      --accent: #e08000;
-      --text: #1a1a1e;
-      --text2: #5a5c6b;
-      --success: #0a8a5a;
-      --danger: #c0392b;
-      --active-tab: #fde8d8;
-      --header-bg: rgba(255, 255, 255, 0.92);
-      --input-bg: #ffffff;
-      --card-hover: rgba(255,106,0,0.04);
-      --code-bg: rgba(0,0,0,0.04);
+      --bg: #070712;
+      --bg-gradient: radial-gradient(circle at 50% 0%, #171026 0%, #070712 70%);
+      --card: #0f0f20;
+      --card-hover: #14142b;
+      --card-inner: #0a0a16;
+      --border: #1f1f3a;
+      --border-bright: #32325c;
+      --accent: #ff793f;
+      --accent-glow: rgba(255, 121, 63, 0.35);
+      --accent2: #7b5ea7;
+      --green: #2ecc71;
+      --green-glow: rgba(46, 204, 113, 0.3);
+      --red: #e74c3c;
+      --blue: #3498db;
+      --text: #ececf8;
+      --text-muted: #8c8cb5;
+      --font: 'Inter', system-ui, -apple-system, sans-serif;
+      --mono: 'JetBrains Mono', monospace;
     }
 
     * {
@@ -58,728 +41,866 @@
       padding: 0;
     }
 
+    html {
+      scrollbar-gutter: stable;
+    }
+
     body {
-      background-color: var(--bg);
-      background-image:
-        radial-gradient(at 0% 0%, rgba(255, 106, 0, 0.08) 0, transparent 50%),
-        radial-gradient(at 100% 100%, rgba(255, 157, 0, 0.08) 0, transparent 50%);
+      font-family: var(--font);
+      background: var(--bg);
+      background-image: var(--bg-gradient);
       color: var(--text);
-      font-family: 'Outfit', sans-serif;
       min-height: 100vh;
       display: flex;
       flex-direction: column;
       overflow-x: hidden;
     }
 
-    header {
-      backdrop-filter: blur(12px);
-      background: var(--header-bg);
-      border-bottom: 1px solid var(--border);
+    /* ─── Topbar ─── */
+    .topbar {
       display: flex;
-      justify-content: space-between;
       align-items: center;
-      padding: 1.25rem 2rem;
+      justify-content: space-between;
+      padding: 14px 28px;
+      border-bottom: 1px solid var(--border);
+      background: rgba(7, 7, 18, 0.85);
       position: sticky;
       top: 0;
       z-index: 100;
-      transition: background 0.3s;
+      backdrop-filter: blur(16px);
     }
 
-    header h1 {
-      font-size: 1.5rem;
+    .topbar-brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      text-decoration: none;
+      color: var(--text);
+    }
+
+    .topbar-logo {
+      font-size: 1.15rem;
       font-weight: 800;
-      letter-spacing: -0.025em;
+      letter-spacing: 1.5px;
     }
 
-    header h1 span {
-      background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
+    .topbar-logo span {
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
     }
 
-    .conn-status-wrapper {
-      display: flex;
-      align-items: center;
-      gap: 0.75rem;
+    .badge-sub {
+      font-size: 0.68rem;
+      font-weight: 700;
+      padding: 3px 8px;
+      border-radius: 6px;
+      background: rgba(255, 121, 63, 0.15);
+      color: var(--accent);
+      border: 1px solid rgba(255, 121, 63, 0.3);
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
     }
 
-    .conn-status {
+    .topbar-actions {
       display: flex;
       align-items: center;
-      gap: 0.5rem;
-      font-size: 0.875rem;
-      color: var(--text2);
-      background: rgba(255, 255, 255, 0.03);
-      padding: 0.5rem 0.875rem;
+      gap: 14px;
+    }
+
+    .conn-status-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 14px;
       border-radius: 20px;
-      border: 1px solid var(--border);
+      font-size: 0.8rem;
+      font-weight: 600;
+      transition: all 0.3s;
     }
 
-    .status-dot {
+    .conn-status-pill.disconnected {
+      background: rgba(231, 76, 60, 0.1);
+      border: 1px solid rgba(231, 76, 60, 0.3);
+      color: var(--red);
+    }
+
+    .conn-status-pill.connected {
+      background: rgba(46, 204, 113, 0.12);
+      border: 1px solid rgba(46, 204, 113, 0.35);
+      color: var(--green);
+      box-shadow: 0 0 12px var(--green-glow);
+    }
+
+    .dot {
       width: 8px;
       height: 8px;
       border-radius: 50%;
-      background: var(--danger);
-      box-shadow: 0 0 10px var(--danger);
-      transition: all 0.3s ease;
+      background: currentColor;
     }
 
-    .status-dot.connected {
-      background: var(--success);
-      box-shadow: 0 0 10px var(--success);
+    /* ─── Buttons ─── */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 10px 20px;
+      border-radius: 10px;
+      border: 1px solid transparent;
+      cursor: pointer;
+      font-size: 0.88rem;
+      font-weight: 600;
+      font-family: inherit;
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+      text-decoration: none;
+      white-space: nowrap;
     }
 
-    .container {
-      max-width: 1200px;
-      margin: 2rem auto;
-      padding: 0 1.5rem;
+    .btn-primary {
+      background: linear-gradient(135deg, var(--accent), #ff5500);
+      color: #fff;
+      box-shadow: 0 4px 16px var(--accent-glow);
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px var(--accent-glow);
+    }
+
+    .btn-outline {
+      background: rgba(255, 255, 255, 0.03);
+      border-color: var(--border-bright);
+      color: var(--text);
+    }
+
+    .btn-outline:hover,
+    .btn-outline.active {
+      background: rgba(255, 121, 63, 0.12);
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+
+    .btn-danger {
+      background: rgba(231, 76, 60, 0.15);
+      border-color: rgba(231, 76, 60, 0.4);
+      color: #ff6b6b;
+    }
+
+    .btn-danger:hover {
+      background: var(--red);
+      color: #fff;
+    }
+
+    .btn-sm {
+      padding: 7px 14px;
+      font-size: 0.8rem;
+      border-radius: 8px;
+    }
+
+    /* ─── Layout & Page Views ─── */
+    .view-container {
       flex: 1;
+      max-width: 1100px;
+      width: 100%;
+      margin: 0 auto;
+      padding: 24px 20px 60px;
     }
 
+    .page-view {
+      display: none;
+      opacity: 0;
+      transform: translateY(12px);
+      transition: opacity 0.35s ease, transform 0.35s ease;
+    }
+
+    .page-view.active {
+      display: block;
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* ─── Cards ─── */
     .card {
-      background: var(--panel);
-      backdrop-filter: blur(20px);
+      background: var(--card);
       border: 1px solid var(--border);
       border-radius: 16px;
-      padding: 2rem;
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
-      margin-bottom: 2rem;
+      padding: 24px;
+      margin-bottom: 20px;
+      transition: border-color 0.2s;
     }
 
-    .connect-panel {
-      text-align: center;
-      max-width: 860px;
-      margin: 3rem auto;
-      animation: fadeIn 0.5s ease-out;
+    .card:hover {
+      border-color: var(--border-bright);
+    }
+
+    .card-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 18px;
+    }
+
+    .card-title-group {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .card-icon {
+      font-size: 1.4rem;
+      width: 40px;
+      height: 40px;
+      border-radius: 10px;
+      background: rgba(255, 121, 63, 0.1);
+      color: var(--accent);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .card h3 {
+      font-size: 1.05rem;
+      font-weight: 700;
+    }
+
+    .card .sub {
+      font-size: 0.82rem;
+      color: var(--text-muted);
+      margin-top: 2px;
+    }
+
+    /* ─── Navigation Tabs ─── */
+    .nav-tabs {
+      display: flex;
+      gap: 6px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 6px;
+      margin-bottom: 24px;
+      overflow-x: auto;
+    }
+
+    .tab-btn {
+      flex: 1;
+      padding: 10px 16px;
+      border-radius: 9px;
+      cursor: pointer;
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      border: none;
+      background: transparent;
+      transition: all 0.2s;
+      white-space: nowrap;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .tab-btn:hover {
+      color: var(--text);
+      background: rgba(255, 255, 255, 0.04);
+    }
+
+    .tab-btn.active {
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      color: #fff;
+      box-shadow: 0 4px 14px var(--accent-glow);
+    }
+
+    .tab-content {
+      display: none;
+      animation: fadeIn 0.3s ease;
+    }
+
+    .tab-content.active {
+      display: block;
     }
 
     @keyframes fadeIn {
       from {
         opacity: 0;
-        transform: translateY(10px);
+        transform: translateY(6px);
       }
 
       to {
         opacity: 1;
-        transform: translateY(0);
+        transform: none;
       }
     }
 
-    .connect-logo {
-      font-size: 4rem;
-      margin-bottom: 1.5rem;
-      filter: drop-shadow(0 0 20px rgba(255, 106, 0, 0.3));
-    }
-
-    .btn {
-      background: linear-gradient(135deg, var(--primary) 0%, var(--primary-hover) 100%);
-      border: none;
-      border-radius: 8px;
-      color: white;
-      cursor: pointer;
-      font-family: inherit;
-      font-weight: 600;
-      padding: 0.75rem 1.75rem;
-      transition: all 0.2s ease;
-      box-shadow: 0 4px 15px rgba(255, 106, 0, 0.3);
-      display: inline-block;
-      text-align: center;
-      text-decoration: none;
-    }
-
-    .btn:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 6px 20px rgba(255, 106, 0, 0.45);
-    }
-
-    .btn:active {
-      transform: translateY(0);
-    }
-
-    .btn-secondary {
-      background: rgba(255, 255, 255, 0.05);
-      border: 1px solid var(--border);
-      color: var(--text);
-      box-shadow: none;
-    }
-
-    .btn-secondary:hover {
-      background: rgba(255, 255, 255, 0.1);
-      box-shadow: none;
-      border-color: var(--primary);
-    }
-
-    .btn-danger {
-      background: var(--danger);
-      box-shadow: 0 4px 15px rgba(239, 68, 68, 0.3);
-      color: white;
-    }
-
-    .btn-danger:hover {
-      box-shadow: 0 6px 20px rgba(239, 68, 68, 0.4);
-    }
-
-    .btn-outline-accent {
-      background: transparent;
-      border: 1px solid var(--border);
-      color: var(--text2);
-    }
-
-    .btn-outline-accent:hover, .btn-outline-accent.active {
-      background: var(--active-tab);
-      border-color: var(--primary);
-      color: var(--text);
-    }
-
-    .nav-tabs {
-      display: flex;
-      gap: 0.5rem;
-      border-bottom: 1px solid var(--border);
-      margin-bottom: 2rem;
-      padding-bottom: 0.5rem;
-    }
-
-    .tab-btn {
-      background: transparent;
-      border: none;
-      color: var(--text2);
-      cursor: pointer;
-      font-family: inherit;
-      font-size: 0.9rem;
-      font-weight: 400;
-      padding: 0.6rem 1rem;
-      border-radius: 8px;
-      transition: all 0.2s;
-    }
-
-    .tab-btn:hover {
-      color: var(--text);
-      background: rgba(255, 106, 0, 0.04);
-    }
-
-    .tab-btn.active {
-      color: white;
-      background: var(--active-tab);
-      border: 1px solid var(--border);
-    }
-
-    .panel {
-      display: none;
-      min-height: 600px;
-    }
-
-    .panel.active {
-      display: block;
-      animation: fadeIn 0.4s ease;
-    }
-
-    .dashboard-grid {
-      display: grid;
-      grid-template-columns: 1fr 365px;
-      gap: 2rem;
-    }
-
-    @media (max-width: 900px) {
-      .dashboard-grid {
-        grid-template-columns: 1fr;
-      }
-    }
-
+    /* ─── Form Controls ─── */
     .form-group {
-      margin-bottom: 1.25rem;
+      margin-bottom: 16px;
     }
 
     .form-group label {
       display: block;
-      font-size: 0.875rem;
+      font-size: 0.78rem;
       font-weight: 600;
-      margin-bottom: 0.5rem;
-      color: var(--text2);
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 6px;
     }
 
-    .form-group input,
-    .form-group select {
-      background: var(--input-bg);
-      border: 1px solid var(--border);
-      border-radius: 8px;
+    input[type=text],
+    input[type=password],
+    input[type=number],
+    select {
+      background: var(--card-inner);
+      border: 1px solid var(--border-bright);
       color: var(--text);
+      padding: 11px 14px;
+      border-radius: 10px;
+      font-size: 0.9rem;
       font-family: inherit;
-      padding: 0.75rem;
       width: 100%;
+    }
+
+    input:focus,
+    select:focus {
       outline: none;
-      transition: border-color 0.2s;
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px var(--accent-glow);
     }
 
-    .form-group select {
-      cursor: pointer;
-      appearance: none;
-      background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%23ff6a00' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
-      background-repeat: no-repeat;
-      background-position: right 0.75rem center;
-      background-size: 1.25rem;
-      padding-right: 2.5rem;
+    .form-row-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
     }
 
-    .form-group select option {
-      background-color: var(--input-bg);
-      color: var(--text);
-    }
-
-    .form-group input:focus,
-    .form-group select:focus {
-      border-color: var(--primary);
-      box-shadow: 0 0 8px rgba(255, 106, 0, 0.25);
+    .form-row-3 {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 14px;
     }
 
     .form-checkbox {
       display: flex;
       align-items: center;
-      gap: 0.5rem;
-      margin-bottom: 1.25rem;
+      gap: 10px;
+      margin-bottom: 14px;
       cursor: pointer;
     }
 
     .form-checkbox input {
-      width: auto;
+      width: 18px;
+      height: 18px;
+      accent-color: var(--accent);
       cursor: pointer;
     }
 
     .form-checkbox label {
-      cursor: pointer;
-      font-size: 0.875rem;
+      font-size: 0.88rem;
       font-weight: 600;
-      color: var(--text2);
-    }
-
-    .theme-toggle {
-      background: rgba(255,255,255,0.06);
-      border: 1px solid var(--border);
-      border-radius: 20px;
       color: var(--text);
       cursor: pointer;
-      font-size: 1rem;
-      padding: 0.4rem 0.85rem;
-      transition: all 0.25s;
-      line-height: 1;
-    }
-    .theme-toggle:hover {
-      background: rgba(255,106,0,0.12);
-      border-color: var(--primary);
     }
 
-    .qs-section {
-      background: var(--panel);
-      border: 1px solid var(--border);
-      border-radius: 14px;
-      padding: 1.5rem 2rem;
-      margin-bottom: 1.25rem;
-    }
-    .qs-section h3 {
-      color: var(--primary);
-      font-size: 1.05rem;
-      margin-bottom: 0.75rem;
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-    }
-    .qs-section ol, .qs-section ul {
-      color: var(--text2);
-      padding-left: 1.25rem;
-      line-height: 1.8;
-      font-size: 0.92rem;
-    }
-    .qs-section strong { color: var(--text); }
-    .qs-tip {
-      background: rgba(255,106,0,0.07);
-      border-left: 3px solid var(--primary);
-      border-radius: 0 8px 8px 0;
-      padding: 0.6rem 1rem;
-      color: var(--text2);
-      font-size: 0.85rem;
-      margin-top: 0.75rem;
-    }
-    .qs-grid {
+    /* ─── Grid Controls ─── */
+    .btn-grid-3 {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-      gap: 1.25rem;
-      margin-bottom: 1.25rem;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      margin-bottom: 16px;
     }
 
-    /* ---- VIRTUAL OLED SCREEN CSS ──── */
+    .btn-grid-4 {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+
+    @media (max-width: 768px) {
+
+      .form-row-2,
+      .form-row-3,
+      .btn-grid-3,
+      .btn-grid-4 {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* ─── LED Section Hide Rule ─── */
+    .led-control-section {
+      transition: all 0.3s ease;
+    }
+
+    .led-control-section.hidden-ssd1306 {
+      display: none !important;
+    }
+
+    /* ─── Serial Console ─── */
+    .serial-log {
+      background: #05050b;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 14px;
+      font-family: var(--mono);
+      font-size: 0.82rem;
+      height: 220px;
+      overflow-y: auto;
+      color: var(--green);
+      margin-bottom: 14px;
+    }
+
+    .log-line {
+      margin-bottom: 4px;
+      line-height: 1.4;
+      word-break: break-all;
+    }
+
+    .log-line.recv {
+      color: #67d7ff;
+    }
+
+    .log-line.error {
+      color: var(--red);
+    }
+
+    .log-line.info {
+      color: var(--text-muted);
+    }
+
+    /* ─── VIRTUAL OLED SCREEN DISPLAY (NO OS BORDER, TOUCH DOT AT 125,61) ─── */
     .oled-bezel {
-      background: #1a1a1a; border: 2px solid #333; border-radius: 12px;
-      padding: 20px; width: 100%; max-width: 320px; margin: 0 auto;
-      box-shadow: inset 0 0 20px rgba(0,0,0,0.8), 0 10px 20px rgba(0,0,0,0.3);
-      display: flex; flex-direction: column; align-items: center;
+      background: #121222;
+      border: 2px solid var(--border-bright);
+      border-radius: 16px;
+      padding: 20px;
+      width: 100%;
+      max-width: 320px;
+      margin: 0 auto;
+      box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.8), 0 10px 24px rgba(0, 0, 0, 0.4);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
     }
 
     .oled-screen {
-      background: #000; width: 256px; height: 128px;
-      border-radius: 4px; position: relative; overflow: hidden;
-      display: flex; flex-direction: column; border: 1px solid #222;
-      color: #fff; font-family: 'Courier New', Courier, monospace;
-      padding: 10px; box-shadow: 0 0 15px rgba(255, 121, 63, 0.1);
+      background: #000;
+      width: 256px;
+      height: 128px;
+      border-radius: 4px;
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      color: #fff;
+      font-family: 'Courier New', Courier, monospace;
+      padding: 10px;
+      box-shadow: 0 0 15px rgba(255, 121, 63, 0.1);
     }
 
-    .hw-button-container { margin-top: 25px; text-align: center; }
-    .hw-button {
-      background: #2d3436; border: 3px solid #555; width: 50px; height: 50px;
-      border-radius: 50%; cursor: pointer; display: inline-flex;
-      justify-content: center; align-items: center; color: #fff;
-      box-shadow: 0 6px 0 #111; transition: all 0.1s;
-    }
-    .hw-button:active, .hw-button.pressed {
-      transform: translateY(6px); box-shadow: 0 0 0 #111; 
-      background: var(--primary); border-color: #fff;
-    }
-
-    .os-header { font-size: 0.72rem; font-weight: bold; text-align: center; border-bottom: 1px solid #fff; padding-bottom: 2px; margin-bottom: 4px; text-transform: uppercase; }
-    .os-center { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; text-align: center;}
-    .os-menu-item { font-size: 0.72rem; padding: 2px 4px; margin-bottom: 1px; display: flex; align-items: center; line-height: 1.2; }
-    .os-menu-item.active { background: #fff; color: #000; border-radius: 2px; }
-    .os-menu-item.active::before { content: '▶ '; font-size: 0.55rem; margin-right: 5px; }
-    
-    .page-dots { position: absolute; bottom: 5px; width: 100%; text-align: center; font-size: 0.5rem; letter-spacing: 2px; color: #fff; left: 0;}
-
-    /* CSS OLED Eyes */
-    .home-eye-container { display: flex; justify-content: center; align-items: center; height: 100%; gap: 30px; width: 100%; position: absolute; top: 0; left: 0; }
-    .eye { width: 35px; height: 45px; background: #fff; border-radius: 50%; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
-    .anim-idle .eye { animation: blink 4s infinite; }
-    .anim-left .eye { transform: translateX(-20px); }
-    .anim-right .eye { transform: translateX(20px); }
-    .anim-down .eye { transform: translateY(15px) scaleY(0.7); }
-    @keyframes blink { 0%, 46%, 48%, 52%, 100% { transform: scaleY(1); } 47%, 50% { transform: scaleY(0.1); } }
-
-    .jiggle-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 0.5rem;
-      margin-bottom: 1rem;
+    /* Bottom-Right Touch Dot Indicator on Virtual OLED */
+    .virtual-touch-dot {
+      position: absolute;
+      bottom: 4px;
+      right: 4px;
+      width: 4px;
+      height: 4px;
+      border-radius: 50%;
+      background: #fff;
+      display: none;
+      box-shadow: 0 0 4px #fff;
     }
 
-    .jump-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 0.5rem;
-      margin-bottom: 1rem;
+    .virtual-touch-dot.active {
+      display: block;
     }
 
-    footer {
-      border-top: 1px solid var(--border);
-      padding: 2rem 0;
+    .hw-button-container {
+      margin-top: 20px;
       text-align: center;
-      font-size: 0.875rem;
-      color: var(--text2);
-      background: rgba(6, 6, 8, 0.95);
-      margin-top: auto;
     }
 
-    footer a {
-      color: var(--primary);
+    .hw-button {
+      background: #22223a;
+      border: 3px solid var(--border-bright);
+      width: 54px;
+      height: 54px;
+      border-radius: 50%;
+      cursor: pointer;
+      display: inline-flex;
+      justify-content: center;
+      align-items: center;
+      color: #fff;
+      box-shadow: 0 6px 0 #0a0a14;
+      transition: all 0.1s;
+    }
+
+    .hw-button:active,
+    .hw-button.pressed {
+      transform: translateY(6px);
+      box-shadow: 0 0 0 #0a0a14;
+      background: var(--accent);
+      border-color: #fff;
+    }
+
+    .os-header {
+      font-size: 0.72rem;
+      font-weight: bold;
+      text-align: center;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+      padding-bottom: 2px;
+      margin-bottom: 4px;
+      text-transform: uppercase;
+    }
+
+    .os-center {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100%;
+      text-align: center;
+    }
+
+    .page-dots {
+      position: absolute;
+      bottom: 5px;
+      width: 100%;
+      text-align: center;
+      font-size: 0.5rem;
+      letter-spacing: 2px;
+      color: #fff;
+      left: 0;
+    }
+
+    /* ─── Toast ─── */
+    #toast {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      background: var(--green);
+      color: #fff;
+      padding: 12px 22px;
+      border-radius: 10px;
+      font-weight: 600;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+      transform: translateY(100px);
+      transition: transform 0.3s;
+      z-index: 1000;
+    }
+
+    #toast.show {
+      transform: translateY(0);
+    }
+
+    #toast.error {
+      background: var(--red);
+    }
+
+    .footer {
+      border-top: 1px solid var(--border);
+      padding: 24px;
+      text-align: center;
+      color: var(--text-muted);
+      font-size: 0.82rem;
+      margin-top: auto;
+      background: rgba(7, 7, 18, 0.95);
+    }
+
+    .footer a {
+      color: var(--accent);
       text-decoration: none;
       font-weight: 600;
-      transition: color 0.2s;
     }
 
-    footer a:hover {
-      color: var(--accent);
+    .footer a:hover {
       text-decoration: underline;
-    }
-
-    .oloverse-hero {
-      text-align: center;
-      padding: 3rem 1rem 1.5rem;
-      animation: fadeIn 0.6s ease;
-    }
-
-    .oloverse-hero .hero-badge {
-      display: inline-block;
-      background: rgba(255, 106, 0, 0.12);
-      border: 1px solid rgba(255, 106, 0, 0.3);
-      border-radius: 20px;
-      padding: 0.35rem 1rem;
-      font-size: 0.8rem;
-      font-weight: 600;
-      color: var(--accent);
-      letter-spacing: 0.05em;
-      margin-bottom: 1.25rem;
-    }
-
-    .oloverse-hero h2 {
-      font-size: clamp(1.75rem, 4vw, 2.75rem);
-      font-weight: 800;
-      line-height: 1.2;
-      margin-bottom: 1rem;
-    }
-
-    .oloverse-hero h2 span {
-      background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-    }
-
-    .oloverse-hero p {
-      color: var(--text2);
-      font-size: 1rem;
-      max-width: 520px;
-      margin: 0 auto 2.5rem;
-      line-height: 1.7;
-    }
-
-    .connect-actions {
-      display: flex;
-      justify-content: center;
-      gap: 1rem;
-      flex-wrap: wrap;
-      margin-top: 2rem;
-    }
-
-    .console-log {
-      background: #000;
-      color: #00ff00;
-      font-family: 'Roboto Mono', monospace;
-      font-size: 0.8rem;
-      padding: 1rem;
-      border-radius: 8px;
-      height: 150px;
-      overflow-y: auto;
-      border: 1px solid var(--border);
     }
   </style>
 </head>
 
 <body>
 
-  <!-- Header status bar -->
-  <header>
-    <h1>OLO <span>Jiggler</span></h1>
-    <div class="conn-status-wrapper">
-      <div class="conn-status">
-        <div id="connDot" class="status-dot"></div>
-        <span id="connLabel">Disconnected</span>
+  <!-- ─── TOP BAR ────────────────────────────────────────────────────────────── -->
+  <nav class="topbar">
+    <a class="topbar-brand" href="https://www.olobit.in" target="_blank">
+      <div class="topbar-logo">OLO<span>JIGGLER</span></div>
+      <span class="badge-sub">BLE MOUSE GADGET</span>
+    </a>
+
+    <div class="topbar-actions">
+      <div id="connPill" class="conn-status-pill disconnected">
+        <span class="dot"></span> <span id="connPillText">Disconnected</span>
       </div>
-      <button id="themeToggle" class="theme-toggle" title="Toggle light / dark theme">🌙</button>
-      <button id="btnDisconnect" class="btn btn-secondary"
-        style="display: none; padding: 0.4rem 0.8rem; font-size: 0.85rem; box-shadow: none;">Disconnect</button>
+      <button id="disconnectHeaderBtn" class="btn btn-danger btn-sm" onclick="disconnectSerial()"
+        style="display: none;">
+        🔌 Disconnect
+      </button>
     </div>
-  </header>
+  </nav>
 
-  <div class="container">
+  <div class="view-container">
 
-    <!-- Connect Panel -->
-    <div id="connectPanel" class="card connect-panel">
-      <div class="oloverse-hero">
-        <div class="hero-badge">🌐 Part of OLOverse Ecosystem</div>
-        <h2>Welcome to <span>OLO Jiggler</span></h2>
-        <p>An advanced BLE Mouse Jiggler and daily utility device for your ESP32-C3. Connect via USB Serial to configure settings, select screensaver options, sync time, and control your device.</p>
+    <!-- ======================================================================= -->
+    <!-- VIEW 1: DISCONNECTED LANDING PAGE                                      -->
+    <!-- ======================================================================= -->
+    <div id="disconnectedView" class="page-view active">
+      <div style="text-align: center; padding: 40px 20px 30px;">
+        <div
+          style="font-size: 0.75rem; font-weight: 700; letter-spacing: 3px; color: var(--accent); text-transform: uppercase; margin-bottom: 8px;">
+          OLOVerse Ecosystem</div>
+        <h1 style="font-size: 2.8rem; font-weight: 800; margin-bottom: 12px;">OLO Jiggler <span
+            style="background: linear-gradient(135deg, var(--accent), var(--accent2)); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">Web
+            Controller</span></h1>
+        <p style="color: var(--text-muted); max-width: 650px; margin: 0 auto; font-size: 1rem; line-height: 1.6;">
+          Connect your OLO Jiggler BLE Mouse companion over USB to configure movement modes, change display hardware
+          pinouts, update Bluetooth identity, sync real-time clock, and flash firmware.
+        </p>
       </div>
 
-      <div class="connect-actions"
-        style="margin: 1.5rem 0 2.5rem 0; justify-content: center; display: flex; gap: 1rem; border-bottom: 1px solid var(--border); padding-bottom: 2.5rem;">
-        <button id="btnConnectUsb" class="btn" style="padding: 0.85rem 2rem; font-size:1rem;">⚡ Connect via USB Serial</button>
-        <button onclick="switchTab('flasher')" class="btn btn-secondary"
-          style="padding: 0.85rem 2rem; font-size:1rem;">🔧 Firmware Flasher</button>
+      <!-- Connection Box -->
+      <div
+        style="background: var(--card); border: 1px solid var(--border-bright); border-radius: 20px; padding: 36px 28px; max-width: 580px; margin: 0 auto 36px; text-align: center;">
+        <div style="font-size: 3rem; margin-bottom: 12px;">⚡</div>
+        <h2 style="font-size: 1.3rem; font-weight: 700; margin-bottom: 8px;">Connect OLO Jiggler via USB</h2>
+        <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 24px;">Plug in your ESP32-C3 board and
+          click below to open the Control Dashboard.</p>
+        <button class="btn btn-primary" style="padding: 14px 28px; font-size: 1rem;" onclick="connectSerial()">
+          🔌 Connect via USB Serial
+        </button>
       </div>
 
-      <!-- Quick Start Guide -->
-      <div style="text-align: left; margin-top: 2rem; padding-top: 1rem;">
-        <h3 style="color: var(--primary); font-size: 1.25rem; font-weight: 800; margin-bottom: 1.5rem; text-align: center;">📖 Quick Start Guide</h3>
-        
-        <div class="qs-grid">
-          <div class="qs-section">
-            <h3>🤔 What is OLO Jiggler?</h3>
-            <ul>
-              <li><strong>Mouse Jiggler</strong> — keeps computer awake over BLE by moving mouse pointer.</li>
-              <li><strong>Utility Pages</strong> — on-screen Daily Tracker, Quotes, Pomodoro, and Stats.</li>
-              <li><strong>OLED Face UI</strong> — animated eye display screensaver when idle.</li>
-              <li><strong>Web Controller</strong> — manage settings, sync clock and flash firmware over USB.</li>
-            </ul>
-          </div>
-          <div class="qs-section">
-            <h3>⚡ System Requirements</h3>
-            <ul>
-              <li>Google Chrome or Microsoft Edge browser (Web Serial API support).</li>
-              <li>OLOBit ESP32-C3 hardware or compatible board.</li>
-              <li>USB-C cable for configuration; BLE support on host PC for jiggling.</li>
-            </ul>
+      <!-- Flasher Card -->
+      <div class="card" style="max-width: 580px; margin: 0 auto 36px;">
+        <div class="card-header">
+          <div class="card-title-group">
+            <div class="card-icon">⚡</div>
+            <div>
+              <h3>Flash Firmware</h3>
+              <p class="sub">Select OLED display hardware type and flash instantly</p>
+            </div>
           </div>
         </div>
-
-        <div class="qs-section">
-          <h3>🔌 Step-by-Step Instructions</h3>
-          <ol>
-            <li>Plug your OLOBit hardware into your computer using a USB-C data cable.</li>
-            <li>Click <strong>⚡ Connect via USB Serial</strong> above, select your device, and click Connect.</li>
-            <li>The dashboard will unlock automatically and synchronize the on-device real-time clock (RTC).</li>
-            <li>Adjust settings in the settings panel, select Jiggle modes, or play retro games on screen!</li>
-          </ol>
-          <div class="qs-tip">💡 The Jiggler functions completely standalone once configured. You only need the USB connection to change options, sync time, or flash firmware.</div>
+        <div class="form-group">
+          <label>Target Display Controller</label>
+          <select id="landingOledType" onchange="onDisplayTypeChange(this.value)">
+            <option value="manifest_sh110x.json">SH110X — 1.3" OLED (SH1106 / SH1107 with NeoPixel)</option>
+            <option value="manifest_ssd1306.json">SSD1306 — 0.96" OLED (Small display)</option>
+          </select>
         </div>
+        <esp-web-install-button id="landingInstallButton" manifest="manifest_sh110x.json">
+          <button slot="activate" class="btn btn-primary" style="width: 100%;">⚡ Install OLO Jiggler Firmware</button>
+        </esp-web-install-button>
       </div>
 
-      <p style="text-align:center; color:var(--text2); font-size:0.8rem; margin-top:1.5rem;">
-        Need official hardware? <a href="https://www.olobit.in" target="_blank"
-          style="color:var(--primary); font-weight:600;">Get the OLOBit Board →</a>
-      </p>
+      <!-- Virtual OS Simulator Card -->
+      <div class="card" style="max-width: 580px; margin: 0 auto; text-align: center;">
+        <h3 style="color: var(--accent); margin-bottom: 0.5rem;">Try OLO Jiggler Virtual Screen</h3>
+        <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1.25rem;">
+          <strong>Single Tap:</strong> Next Page &nbsp;|&nbsp; <strong>Double Tap:</strong> Action &nbsp;|&nbsp;
+          <strong>Long Press:</strong> Menu
+        </p>
+
+        <div class="oled-bezel">
+          <div class="oled-screen" id="virtual-screen"></div>
+          <div class="virtual-touch-dot" id="virtualTouchDot"></div>
+          <div class="hw-button-container">
+            <div class="hw-button" id="virtual-btn">
+              <span style="font-size: 1.25rem;">👆</span>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
 
-    <!-- Main Dashboard -->
-    <div id="mainDashboard" style="display: none;">
+
+    <!-- ======================================================================= -->
+    <!-- VIEW 2: CONNECTED MAIN CONTROL DASHBOARD                               -->
+    <!-- ======================================================================= -->
+    <div id="connectedView" class="page-view">
+
+      <!-- Navigation Tabs -->
       <div class="nav-tabs">
-        <button class="tab-btn active" id="tabBtn-controller" onclick="switchTab('controller')">⚡ Controller</button>
-        <button class="tab-btn" id="tabBtn-settings" onclick="switchTab('settings')">⚙️ Settings</button>
-        <button class="tab-btn" id="tabBtn-flasher" onclick="switchTab('flasher')">🔧 Flasher</button>
-        <button class="tab-btn" onclick="btnDisconnect.click()"
-          style="color: #ff4d4d; margin-left: auto; border: 1px solid rgba(255,77,77,0.25); background: rgba(255,77,77,0.05); padding: 0.5rem 1rem; border-radius: 8px;">🔌 Disconnect</button>
+        <button class="tab-btn active" onclick="switchDashTab(0)" id="dtab0">⚡ Jiggler Controls</button>
+        <button class="tab-btn" onclick="switchDashTab(1)" id="dtab1">⚙️ Settings &amp; Pins</button>
+        <button class="tab-btn" onclick="switchDashTab(2)" id="dtab2">🌐 BLE &amp; Timers</button>
+        <button class="tab-btn" onclick="switchDashTab(3)" id="dtab3" id="ledTabBtn">💡 NeoPixel LED</button>
+        <button class="tab-btn" onclick="switchDashTab(4)" id="dtab4">🔧 Web Flasher</button>
+        <button class="tab-btn" onclick="switchDashTab(5)" id="dtab5">💻 Console</button>
       </div>
 
-      <!-- Tab: Controller -->
-      <div id="tab-controller" class="panel active">
-        <div class="dashboard-grid">
-          <div>
-            <!-- Device Jiggle Mode & Quick Jump -->
-            <div class="card">
-              <h3 style="color: var(--primary); margin-bottom: 1.25rem;">⚡ Jiggler Controls</h3>
-              
-              <div class="form-group">
-                <label>Active Jiggle Mode</label>
-                <div class="jiggle-grid">
-                  <button class="btn btn-outline-accent btn-jiggle" data-mode="0">NONE</button>
-                  <button class="btn btn-outline-accent btn-jiggle" data-mode="1">SLOW</button>
-                  <button class="btn btn-outline-accent btn-jiggle" data-mode="2">FAST</button>
-                  <button class="btn btn-outline-accent btn-jiggle" data-mode="3">ZIGZAG</button>
-                  <button class="btn btn-outline-accent btn-jiggle" data-mode="4">SQUARE</button>
-                  <button class="btn btn-outline-accent btn-jiggle" data-mode="5">WAVE</button>
-                </div>
-              </div>
-
-              <div class="form-group" style="margin-top: 1.5rem; border-top: 1px solid var(--border); padding-top: 1.5rem;">
-                <label>Page Quick Jump</label>
-                <div class="jump-grid">
-                  <button class="btn btn-outline-accent btn-page" data-page="0">0. Mouse Jiggler</button>
-                  <button class="btn btn-outline-accent btn-page" data-page="1">1. System Stats</button>
-                  <button class="btn btn-outline-accent btn-page" data-page="2">2. Daily Quote</button>
-                  <button class="btn btn-outline-accent btn-page" data-page="3">3. CPU Temp</button>
-                  <button class="btn btn-outline-accent btn-page" data-page="4">4. Pomodoro</button>
-                  <button class="btn btn-outline-accent btn-page" data-page="5">5. Eye Animation</button>
-                  <button class="btn btn-outline-accent btn-page" data-page="6">6. Habit Tracker</button>
-                  <button class="btn btn-outline-accent btn-page" id="btnSyncClockPage" data-page="7">7. Sync Clock</button>
-                </div>
-              </div>
-
-              <div style="display: flex; gap: 1rem; border-top: 1px solid var(--border); padding-top: 1.5rem;">
-                <button id="btnPlayTone" class="btn btn-secondary" style="flex: 1;">🔊 Play Test Tone</button>
-                <button id="btnResetTracker" class="btn btn-danger" style="flex: 1;">🔄 Reset Daily Tracker</button>
+      <!-- TAB 0: CONTROLS & QUICK JUMP -->
+      <div id="dpanel0" class="tab-content active">
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title-group">
+              <div class="card-icon">🖱️</div>
+              <div>
+                <h3>Active Mouse Jiggle Mode</h3>
+                <p class="sub">Select movement behavior pattern</p>
               </div>
             </div>
           </div>
+          <div class="btn-grid-3">
+            <button class="btn btn-outline btn-jiggle" data-mode="0" onclick="setJiggleMode(0)">NONE (Off)</button>
+            <button class="btn btn-outline btn-jiggle" data-mode="1" onclick="setJiggleMode(1)">SLOW</button>
+            <button class="btn btn-outline btn-jiggle" data-mode="2" onclick="setJiggleMode(2)">FAST</button>
+            <button class="btn btn-outline btn-jiggle" data-mode="3" onclick="setJiggleMode(3)">ZIGZAG</button>
+            <button class="btn btn-outline btn-jiggle" data-mode="4" onclick="setJiggleMode(4)">SQUARE</button>
+            <button class="btn btn-outline btn-jiggle" data-mode="5" onclick="setJiggleMode(5)">WAVE</button>
+          </div>
+        </div>
 
-          <div>
-            <!-- LED settings (SH110X version only) -->
-            <div class="card" id="led-setup-card">
-              <h3 style="color: var(--primary); margin-bottom: 1.25rem;">💡 Status NeoPixel Settings</h3>
-              
-              <div class="form-checkbox">
-                <input type="checkbox" id="setLedBypass" />
-                <label for="setLedBypass">Enable LED Bypass Mode (Override Status Indicators)</label>
-              </div>
-
-              <div id="led-override-controls" style="opacity: 0.5; pointer-events: none; transition: opacity 0.2s;">
-                <div class="form-group">
-                  <label>Bypass Effect</label>
-                  <select id="selectLedEffect">
-                    <option value="0">Solid Color</option>
-                    <option value="1">Rainbow Cycle</option>
-                    <option value="2">Breathing Pulse</option>
-                    <option value="3">Strobe Flash</option>
-                    <option value="4">Always OFF</option>
-                  </select>
-                </div>
-
-                <div class="form-group">
-                  <label>Red Channel (<span id="valR">255</span>)</label>
-                  <input type="range" id="sliderR" min="0" max="255" value="255" style="width: 100%;" />
-                </div>
-                <div class="form-group">
-                  <label>Green Channel (<span id="valG">120</span>)</label>
-                  <input type="range" id="sliderG" min="0" max="255" value="120" style="width: 100%;" />
-                </div>
-                <div class="form-group">
-                  <label>Blue Channel (<span id="valB">0</span>)</label>
-                  <input type="range" id="sliderB" min="0" max="255" value="0" style="width: 100%;" />
-                </div>
-
-                <div id="ledPreview" style="height: 40px; border-radius: 8px; background: rgb(255, 120, 0); text-align: center; line-height: 40px; font-weight: bold; text-shadow: 0 1px 3px rgba(0,0,0,0.8); border: 1px solid rgba(255,255,255,0.1);">
-                  LED OUTPUT PREVIEW
-                </div>
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title-group">
+              <div class="card-icon">📱</div>
+              <div>
+                <h3>Screen Quick Jump</h3>
+                <p class="sub">Jump directly to any display page on hardware</p>
               </div>
             </div>
-
-            <!-- Serial Log -->
-            <div class="card">
-              <h3 style="color: var(--primary); margin-bottom: 1.25rem;">📟 Serial Event Log</h3>
-              <div id="serialConsole" class="console-log">
-                [SYSTEM] Ready. Connect device to see logs...
-              </div>
-            </div>
+          </div>
+          <div class="btn-grid-4">
+            <button class="btn btn-outline btn-page" data-page="0" onclick="setPage(0)">0. Jiggler</button>
+            <button class="btn btn-outline btn-page" data-page="1" onclick="setPage(1)">1. Stats</button>
+            <button class="btn btn-outline btn-page" data-page="2" onclick="setPage(2)">2. Daily Quote</button>
+            <button class="btn btn-outline btn-page" data-page="3" onclick="setPage(3)">3. Temp Graph</button>
+            <button class="btn btn-outline btn-page" data-page="4" onclick="setPage(4)">4. Pomodoro</button>
+            <button class="btn btn-outline btn-page" data-page="5" onclick="setPage(5)">5. Eye Anim</button>
+            <button class="btn btn-outline btn-page" data-page="6" onclick="setPage(6)">6. Tracker</button>
+            <button class="btn btn-outline btn-page" data-page="7" onclick="setPage(7)">7. Sync Clock</button>
+          </div>
+          <div style="display: flex; gap: 12px; margin-top: 14px;">
+            <button class="btn btn-outline" style="flex: 1;" onclick="sendCommand('PLAY_TONE')">🔊 Play Test
+              Tone</button>
+            <button class="btn btn-danger" style="flex: 1;" onclick="resetTracker()">🔄 Reset Daily Tracker</button>
           </div>
         </div>
       </div>
 
-      <!-- Tab: Settings -->
-      <div id="tab-settings" class="panel">
-        <div class="dashboard-grid">
-          <div class="card">
-            <h3 style="color: var(--primary); margin-bottom: 1.25rem;">⚙️ General Device Preferences</h3>
-            
-            <div class="form-checkbox">
-              <input type="checkbox" id="setBuzzerEn" />
-              <label for="setBuzzerEn">Enable General Buzzer Sounds</label>
-            </div>
-
-            <div class="form-checkbox">
-              <input type="checkbox" id="setAnimSoundEn" />
-              <label for="setAnimSoundEn">Enable Eye Animation Sound Chirps</label>
-            </div>
-
-            <div class="form-checkbox">
-              <input type="checkbox" id="setInvertOled" />
-              <label for="setInvertOled">Invert OLED Display Colors</label>
-            </div>
-
-            <div class="form-group" style="margin-top: 1rem;">
-              <label>Page Animation Type</label>
-              <select id="selectPageAnim">
-                <option value="0">Horizontal Slide</option>
-                <option value="1">Vertical Slide</option>
-                <option value="2">Immediate (No Animation)</option>
-              </select>
+      <!-- TAB 1: SETTINGS & HARDWARE PINS -->
+      <div id="dpanel1" class="tab-content">
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title-group">
+              <div class="card-icon">📺</div>
+              <div>
+                <h3>Display Controller &amp; Hardware Pinouts (NVS Saved)</h3>
+                <p class="sub">Select display type and customize GPIO pin assignments</p>
+              </div>
             </div>
           </div>
+          <div class="form-group">
+            <label>OLED Display Type (Saved to Preferences)</label>
+            <select id="selectDispType">
+              <option value="0">SH110X — 1.3" OLED (SH1106 / SH1107 with NeoPixel LED)</option>
+              <option value="1">SSD1306 — 0.96" OLED (Small display / No LED functionality)</option>
+            </select>
+          </div>
+          <div class="form-row-2">
+            <div class="form-group">
+              <label>I2C SDA Pin</label>
+              <input type="number" id="inputSdaPin" placeholder="21" min="0" max="48" />
+            </div>
+            <div class="form-group">
+              <label>I2C SCL Pin</label>
+              <input type="number" id="inputSclPin" placeholder="20" min="0" max="48" />
+            </div>
+          </div>
+          <div class="form-row-3">
+            <div class="form-group">
+              <label>Touch/Button Pin</label>
+              <input type="number" id="inputBtnPin" placeholder="1" min="0" max="48" />
+            </div>
+            <div class="form-group">
+              <label>Buzzer Pin</label>
+              <input type="number" id="inputBuzPin" placeholder="2" min="0" max="48" />
+            </div>
+            <div class="form-group">
+              <label>NeoPixel Pin</label>
+              <input type="number" id="inputNeoPin" placeholder="6" min="0" max="48" />
+            </div>
+          </div>
+          <button class="btn btn-primary" style="width: 100%; margin-top: 8px;" onclick="saveHardwarePins()">
+            💾 Save Display Type &amp; Hardware Pins (Reboots Board)
+          </button>
+        </div>
 
-          <!-- Bluetooth Identity Card -->
-          <div class="card">
-            <h3 style="color: var(--primary); margin-bottom: 1.25rem;">🌐 Bluetooth Identity</h3>
-            <p style="color: var(--text2); font-size: 0.85rem; margin-bottom: 1.25rem; line-height: 1.4;">
-              Change your Bluetooth broadcast name and manufacturer details. Applying changes will restart the device and generate a new MAC address so it pairs as a brand-new device.
-            </p>
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title-group">
+              <div class="card-icon">⚙️</div>
+              <div>
+                <h3>General Preferences</h3>
+                <p class="sub">System audio, animation and display inversion settings</p>
+              </div>
+            </div>
+          </div>
+          <div class="form-checkbox">
+            <input type="checkbox" id="setBuzzerEn" onchange="sendToggleSetting('SET_SOUND', this.checked)" />
+            <label for="setBuzzerEn">Enable General Buzzer Sounds</label>
+          </div>
+          <div class="form-checkbox">
+            <input type="checkbox" id="setAnimSoundEn" onchange="sendToggleSetting('SET_ANIMSOUND', this.checked)" />
+            <label for="setAnimSoundEn">Enable Eye Animation Sound Chirps</label>
+          </div>
+          <div class="form-checkbox">
+            <input type="checkbox" id="setInvertOled" onchange="sendToggleSetting('SET_INVERT', this.checked)" />
+            <label for="setInvertOled">Invert OLED Display Colors</label>
+          </div>
+          <div class="form-group" style="margin-top: 14px;">
+            <label>Page Transition Animation Style</label>
+            <select id="selectPageAnim" onchange="sendCommand('SET_PAGEANIM:' + this.value)">
+              <option value="0">Horizontal Slide</option>
+              <option value="1">Vertical Slide</option>
+              <option value="2">Immediate (No Animation)</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB 2: BLE & TIMERS -->
+      <div id="dpanel2" class="tab-content">
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title-group">
+              <div class="card-icon">🌐</div>
+              <div>
+                <h3>Bluetooth Identity &amp; MAC Offset</h3>
+                <p class="sub">Update broadcast name and manufacturer info</p>
+              </div>
+            </div>
+          </div>
+          <div class="form-row-2">
             <div class="form-group">
               <label>BLE Device Name</label>
               <input type="text" id="inputBleName" placeholder="OLO Bit" maxlength="30" />
             </div>
             <div class="form-group">
-              <label>Manufacturer Details</label>
+              <label>Manufacturer Name</label>
               <input type="text" id="inputBleMfg" placeholder="Micromaker Labs" maxlength="30" />
             </div>
-            <button id="btnSaveBle" class="btn" style="width: 100%; margin-top: 0.5rem;">💾 Update BLE Identity</button>
           </div>
+          <button class="btn btn-primary" style="width: 100%;" onclick="saveBleIdentity()">
+            💾 Update BLE Identity &amp; Restart Board
+          </button>
+        </div>
 
-          <div class="card">
-            <h3 style="color: var(--primary); margin-bottom: 1.25rem;">⏱️ Timers & Timezone</h3>
-            
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title-group">
+              <div class="card-icon">⏱️</div>
+              <div>
+                <h3>Timers &amp; Timezone Sync</h3>
+                <p class="sub">Configure screensaver, auto-stop timer, and RTC clock</p>
+              </div>
+            </div>
+          </div>
+          <div class="form-row-3">
             <div class="form-group">
-              <label>Screensaver Activation Timeout</label>
-              <select id="selectScreensaver">
+              <label>Screensaver Timeout</label>
+              <select id="selectScreensaver" onchange="sendCommand('SET_SCREENSAVER:' + this.value)">
                 <option value="300000">5 Minutes</option>
                 <option value="600000">10 Minutes</option>
                 <option value="900000">15 Minutes</option>
@@ -788,10 +909,9 @@
                 <option value="0">Never</option>
               </select>
             </div>
-
             <div class="form-group">
               <label>Jiggler Auto-Stop Timer</label>
-              <select id="selectJgTime">
+              <select id="selectJgTime" onchange="sendCommand('SET_JGTIME:' + this.value)">
                 <option value="1800000">30 Minutes</option>
                 <option value="3600000">1 Hour</option>
                 <option value="7200000">2 Hours</option>
@@ -800,10 +920,9 @@
                 <option value="0">Never</option>
               </select>
             </div>
-
             <div class="form-group">
-              <label>Active Animation Delay</label>
-              <select id="selectAnimDelay">
+              <label>Eye Animation Delay</label>
+              <select id="selectAnimDelay" onchange="sendCommand('SET_ANIMDELAY:' + this.value)">
                 <option value="5000">5 Seconds</option>
                 <option value="10000">10 Seconds</option>
                 <option value="30000">30 Seconds</option>
@@ -812,322 +931,156 @@
                 <option value="0">Never</option>
               </select>
             </div>
+          </div>
 
-            <div class="form-checkbox" style="margin-top: 1rem;">
-              <input type="checkbox" id="setAutoTimeSync" checked />
-              <label for="setAutoTimeSync">Enable Automatic Clock Time Sync</label>
+          <div class="form-checkbox" style="margin-top: 10px;">
+            <input type="checkbox" id="setAutoTimeSync" checked />
+            <label for="setAutoTimeSync">Enable Background Automatic Clock Sync</label>
+          </div>
+
+          <div class="form-group">
+            <label>Timezone Offset</label>
+            <select id="selectTimezone">
+              <option value="0">Local Host Time (Default)</option>
+              <option value="-12">UTC-12:00</option>
+              <option value="-8">UTC-08:00 (PST)</option>
+              <option value="-5">UTC-05:00 (EST)</option>
+              <option value="0">UTC+00:00 (GMT)</option>
+              <option value="1">UTC+01:00 (CET)</option>
+              <option value="5.5">UTC+05:30 (IST)</option>
+              <option value="8">UTC+08:00 (SGT)</option>
+              <option value="9">UTC+09:00 (JST)</option>
+            </select>
+          </div>
+
+          <div style="display: flex; gap: 12px; margin-top: 14px;">
+            <button class="btn btn-primary" style="flex: 1;" onclick="syncTimeNow()">⚡ Sync Time Now</button>
+            <button class="btn btn-danger" style="flex: 1;" onclick="factoryReset()">🧨 Factory Reset Settings</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB 3: NEOPIXEL LED (SH110X ONLY) -->
+      <div id="dpanel3" class="tab-content">
+        <div id="led-setup-card" class="card led-control-section">
+          <div class="card-header">
+            <div class="card-title-group">
+              <div class="card-icon">💡</div>
+              <div>
+                <h3>Status NeoPixel RGB LED</h3>
+                <p class="sub">Configure custom LED override effects and color channels</p>
+              </div>
             </div>
+          </div>
 
+          <div class="form-checkbox">
+            <input type="checkbox" id="setLedBypass" onchange="sendLedState()" />
+            <label for="setLedBypass">Enable LED Override Mode</label>
+          </div>
+
+          <div id="led-override-controls" style="opacity: 0.5; pointer-events: none; transition: opacity 0.2s;">
             <div class="form-group">
-              <label>Timezone Offset</label>
-              <select id="selectTimezone">
-                <option value="0">Local Host Time (Default)</option>
-                <option value="-12">UTC-12:00</option>
-                <option value="-11">UTC-11:00</option>
-                <option value="-10">UTC-10:00</option>
-                <option value="-9">UTC-09:00</option>
-                <option value="-8">UTC-08:00 (PST)</option>
-                <option value="-7">UTC-07:00 (MST)</option>
-                <option value="-6">UTC-06:00 (CST)</option>
-                <option value="-5">UTC-05:00 (EST)</option>
-                <option value="-4">UTC-04:00</option>
-                <option value="-3">UTC-03:00</option>
-                <option value="-2">UTC-02:00</option>
-                <option value="-1">UTC-01:00</option>
-                <option value="0">UTC+00:00 (GMT/WET)</option>
-                <option value="1">UTC+01:00 (CET)</option>
-                <option value="2">UTC+02:00 (EET)</option>
-                <option value="3">UTC+03:00 (MSK)</option>
-                <option value="4">UTC+04:00 (GST)</option>
-                <option value="5">UTC+05:00</option>
-                <option value="5.5">UTC+05:30 (IST)</option>
-                <option value="6">UTC+06:00</option>
-                <option value="7">UTC+07:00 (WIB)</option>
-                <option value="8">UTC+08:00 (CST/SGT)</option>
-                <option value="9">UTC+09:00 (JST)</option>
-                <option value="10">UTC+10:00 (AEST)</option>
-                <option value="11">UTC+11:00</option>
-                <option value="12">UTC+12:00 (NZST)</option>
+              <label>Preset Bypass Effect</label>
+              <select id="selectLedEffect" onchange="sendLedState()">
+                <option value="0">Solid Color</option>
+                <option value="1">Rainbow Cycle</option>
+                <option value="2">Breathing Pulse</option>
+                <option value="3">Strobe Flash</option>
+                <option value="4">Always OFF</option>
               </select>
             </div>
 
-            <div style="display: flex; gap: 1rem; margin-top: 1.5rem;">
-              <button id="btnSyncTime" class="btn" style="flex: 1;">⚡ Sync Clock Time</button>
-              <button id="btnFactoryReset" class="btn btn-danger" style="flex: 1;">🧨 Factory Reset Settings</button>
+            <div class="form-group">
+              <label>Red Channel (<span id="valR">255</span>)</label>
+              <input type="range" id="sliderR" min="0" max="255" value="255" style="width: 100%;"
+                oninput="throttleLedSend()" />
+            </div>
+            <div class="form-group">
+              <label>Green Channel (<span id="valG">120</span>)</label>
+              <input type="range" id="sliderG" min="0" max="255" value="120" style="width: 100%;"
+                oninput="throttleLedSend()" />
+            </div>
+            <div class="form-group">
+              <label>Blue Channel (<span id="valB">0</span>)</label>
+              <input type="range" id="sliderB" min="0" max="255" value="0" style="width: 100%;"
+                oninput="throttleLedSend()" />
+            </div>
+
+            <div id="ledPreview"
+              style="height: 40px; border-radius: 10px; background: rgb(255, 120, 0); text-align: center; line-height: 40px; font-weight: bold; text-shadow: 0 1px 3px rgba(0,0,0,0.8); border: 1px solid var(--border-bright);">
+              LED COLOR PREVIEW
             </div>
           </div>
         </div>
-      </div>
-    </div>
 
-    <!-- Tab: Flasher -->
-    <div id="tab-flasher" class="panel">
-      <div class="card" style="max-width: 600px; margin: 2rem auto; text-align: center;">
-        <div class="connect-logo" style="font-size: 3.5rem;">⚡</div>
-        <h2 style="margin-bottom: 1rem; color: var(--primary);">Flash OLO Jiggler Firmware</h2>
-        <p style="color: var(--text2); margin-bottom: 2rem; font-size: 0.95rem; line-height: 1.6; text-align: left;">
-          Select your screen controller configuration, then connect your dev board to flash. If the device is not detected, hold the physical <strong>BOOT</strong> button while plugging in the USB-C cable.
-        </p>
-
-        <div class="form-group" style="max-width: 320px; margin: 0 auto 2rem auto; text-align: left;">
-          <label style="text-align: center; display: block;">Select Target Environment</label>
-          <select id="flashEnvSelect" onchange="updateFlasherManifest()">
-            <option value="manifest_sh110x.json">SH110X — Mono (1.3&quot; OLED, Big display)</option>
-            <option value="manifest_ssd1306.json">SSD1306 — Mono (0.96&quot; OLED, Small display)</option>
-          </select>
+        <div id="led-disabled-msg" class="card" style="display: none; text-align: center; padding: 40px 20px;">
+          <div style="font-size: 2.5rem; margin-bottom: 12px;">🚫</div>
+          <h3 style="margin-bottom: 8px;">NeoPixel LED Disabled</h3>
+          <p style="color: var(--text-muted); font-size: 0.9rem;">
+            NeoPixel LED controls are disabled when SSD1306 (0.96" display) is selected. Switch to SH110X (1.3" display)
+            in Settings &amp; Pins to enable LED hardware.
+          </p>
         </div>
+      </div>
 
-        <div style="display: flex; justify-content: center; min-height: 48px; gap: 1rem;">
+      <!-- TAB 4: WEB FLASHER -->
+      <div id="dpanel4" class="tab-content">
+        <div class="card" style="max-width: 600px; margin: 0 auto; text-align: center;">
+          <div style="font-size: 3rem; margin-bottom: 12px;">⚡</div>
+          <h2 style="font-size: 1.3rem; font-weight: 700; margin-bottom: 8px;">Web Serial Firmware Flasher</h2>
+          <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 24px; text-align: left;">
+            Select your display controller target and click Connect &amp; Flash to install or update OLO Jiggler
+            firmware directly over USB.
+          </p>
+          <div class="form-group" style="text-align: left;">
+            <label>Target Environment</label>
+            <select id="flashEnvSelect" onchange="updateFlasherManifest()">
+              <option value="manifest_sh110x.json">SH110X — 1.3" OLED Display (Big Display with LED)</option>
+              <option value="manifest_ssd1306.json">SSD1306 — 0.96" OLED Display (Small Display)</option>
+            </select>
+          </div>
           <esp-web-install-button id="flasherBtn" manifest="manifest_sh110x.json">
-            <button slot="activate" class="btn">Connect & Flash</button>
-            <span slot="unsupported">Your browser does not support Web Serial. Use Google Chrome or MS Edge.</span>
+            <button slot="activate" class="btn btn-primary" style="width: 100%;">⚡ Connect &amp; Flash
+              Firmware</button>
+            <span slot="unsupported" style="color: var(--red);">Web Serial API not supported in this browser. Use
+              Google Chrome or Edge.</span>
           </esp-web-install-button>
-          <button onclick="closeFlasher()" id="flasherBackBtn" class="btn btn-secondary">Back to Control</button>
         </div>
       </div>
-    </div>
 
-    <!-- Virtual OS Simulator (only shown when disconnected on Landing Page) -->
-    <div id="virtualScreenContainer" class="card" style="max-width: 420px; margin: 0 auto 2rem auto; text-align: center;">
-      <h3 style="color: var(--primary); margin-bottom: 0.5rem;"><i class="fa-solid fa-microchip text-accent me-2"></i> Try OLO Jiggler</h3>
-      <p style="font-size: 0.85rem; color: var(--text2); margin-bottom: 1.25rem;">
-        <strong>Tap:</strong> Scroll &nbsp;|&nbsp; <strong>Hold:</strong> Select &nbsp;|&nbsp; <strong>Double Tap:</strong> Action
-      </p>
-      
-      <div class="oled-bezel">
-        <div class="oled-screen" id="virtual-screen"></div>
-        <div class="hw-button-container">
-          <div class="hw-button" id="virtual-btn">
-            <span style="font-size: 1.25rem;">👆</span>
+      <!-- TAB 5: CONSOLE -->
+      <div id="dpanel5" class="tab-content">
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title-group">
+              <div class="card-icon">📟</div>
+              <div>
+                <h3>Serial Event Console</h3>
+                <p class="sub">Real-time Web Serial RX/TX data communication log</p>
+              </div>
+            </div>
+            <button class="btn btn-outline btn-sm" onclick="clearConsole()">Clear Log</button>
+          </div>
+          <div id="serialConsole" class="serial-log">
+            [SYSTEM] Web Serial Controller initialized. Connect device to begin...
           </div>
         </div>
       </div>
+
     </div>
 
   </div>
 
-  <!-- OLOverse Footer -->
-  <footer>
-    <p>Part of the <span style="color: var(--primary); font-weight: 600;">OLOverse</span> ecosystem.</p>
-    <p style="margin-top: 0.5rem;">Need official hardware? <a href="https://www.olobit.in" target="_blank">Get the OLOBit Board</a></p>
+  <!-- Toast Notification -->
+  <div id="toast">Settings Updated</div>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <p>Part of the <a href="https://www.olobit.in" target="_blank">OLOverse</a> ecosystem by Micromaker Labs.</p>
   </footer>
 
   <script>
-    // --- Light/Dark Theme Logic ---
-    const themeToggle = document.getElementById('themeToggle');
-    themeToggle.onclick = () => {
-      const current = document.body.getAttribute('data-theme');
-      if (current === 'light') {
-        document.body.removeAttribute('data-theme');
-        themeToggle.textContent = '🌙';
-      } else {
-        document.body.setAttribute('data-theme', 'light');
-        themeToggle.textContent = '☀️';
-      }
-    };
-
-    // --- VIRTUAL OS LOGIC ---
-    const screen = document.getElementById('virtual-screen');
-    const btn = document.getElementById('virtual-btn');
-
-    let currentState = 'HOME'; 
-    let homePageIndex = 0;
-    const MAX_HOME_PAGES = 4; // 0=Jiggler, 1=Pomodoro, 2=Habit, 3=Pet Eyes
-    
-    let menuSelection = 0;
-    let menuScroll = 0;
-    
-    const menus = {
-      main: [
-        "Mode: SLOW", "Jiggle Timer: Never", "Games...", "Quote Mode", 
-        "Screensaver: 5m", "Anim Delay: 5s", "Page Anim: Slide", 
-        "Sound: ON", "Anim Sound: ON", "Invert Disp: OFF", 
-        "Reset Tracker", "Reset EEPROM", "Back"
-      ],
-      games: ["Flappy Block", "Dino Run", "Reaction Test", "Back"]
-    };
-
-    let pomoActive = false;
-    let habitCount = 0;
-    let eyeAnimClass = 'anim-idle';
-
-    function renderScreen() {
-      if (currentState === 'HOME') {
-        let dots = ['○','○','○','○'];
-        dots[homePageIndex] = '●';
-
-        if (homePageIndex === 0) {
-          screen.innerHTML = `
-            <div class="os-header border-0 mb-0">Bluetooth: Paired</div>
-            <div class="os-center">
-              <h3 class="m-0 fw-bold" style="font-size:1.15rem; color:var(--primary);">JIGGLING</h3>
-              <div style="font-size: 0.7rem; margin-top:5px; color:var(--text2);">Mode: SLOW</div>
-            </div>
-            <div class="page-dots">${dots.join('')}</div>
-          `;
-        } else if (homePageIndex === 1) {
-          screen.innerHTML = `
-            <div class="os-header">POMODORO TIMER</div>
-            <div class="os-center">
-              <h2 class="m-0 fw-bold" style="font-size:1.5rem; color:#fff;">25:00</h2>
-              <div style="font-size: 0.6rem; margin-top:5px; color:var(--text2);">${pomoActive ? 'WORK SPRINT' : 'Double Tap to Start'}</div>
-            </div>
-            <div class="page-dots">${dots.join('')}</div>
-          `;
-        } else if (homePageIndex === 2) {
-          screen.innerHTML = `
-            <div class="os-header">DAILY TRACKER</div>
-            <div class="os-center">
-              <h1 class="m-0 fw-bold" style="font-size:2rem; color:#fff;">${habitCount}</h1>
-              <div style="font-size: 0.6rem; color:var(--text2);">Double Tap to Add</div>
-            </div>
-            <div class="page-dots">${dots.join('')}</div>
-          `;
-        } else if (homePageIndex === 3) {
-          screen.innerHTML = `
-            <div class="home-eye-container ${eyeAnimClass}" id="pet-eyes">
-              <div class="eye left" style="background:#fff;"></div>
-              <div class="eye right" style="background:#fff;"></div>
-            </div>
-            <div class="page-dots">${dots.join('')}</div>
-          `;
-        }
-      } 
-      else if (currentState === 'MAIN_MENU' || currentState === 'GAMES_MENU') {
-        const isMain = currentState === 'MAIN_MENU';
-        const title = isMain ? "SETTINGS" : "-- GAMES --";
-        const items = isMain ? menus.main : menus.games;
-        
-        if (menuSelection >= menuScroll + 4) {
-          menuScroll = menuSelection - 3;
-        } else if (menuSelection < menuScroll) {
-          menuScroll = menuSelection;
-        }
-
-        let listHTML = '';
-        for (let i = menuScroll; i < Math.min(items.length, menuScroll + 4); i++) {
-          const active = i === menuSelection ? 'active' : '';
-          listHTML += `<div class="os-menu-item ${active}">${items[i]}</div>`;
-        }
-
-        screen.innerHTML = `
-          <div class="os-header" style="color:var(--primary); font-weight:bold;">${title}</div>
-          <div style="flex-grow:1; display:flex; flex-direction:column; gap:2px; z-index: 10;">${listHTML}</div>
-        `;
-      }
-    }
-
-    // --- BUTTON PRESS LOGIC ---
-    let pressTimer;
-    let tapCount = 0;
-    let waitingForDoubleTap = false;
-    let doubleTapTimer;
-    let isLongPress = false;
-
-    function handlePressStart(e) {
-      if(e && e.cancelable) e.preventDefault();
-      btn.classList.add('pressed');
-      isLongPress = false;
-      clearTimeout(pressTimer);
-      
-      pressTimer = setTimeout(() => {
-        isLongPress = true;
-        actionLongPress();
-        btn.classList.remove('pressed'); 
-      }, 500);
-    }
-
-    function handlePressEnd(e) {
-      if(e && e.cancelable) e.preventDefault();
-      btn.classList.remove('pressed');
-      clearTimeout(pressTimer);
-      
-      if (!isLongPress) {
-        tapCount++;
-        waitingForDoubleTap = true;
-        clearTimeout(doubleTapTimer);
-        
-        doubleTapTimer = setTimeout(() => {
-          if (tapCount === 1) actionSingleTap();
-          else if (tapCount >= 2) actionDoubleTap();
-          
-          tapCount = 0;
-          waitingForDoubleTap = false;
-        }, 250);
-      }
-    }
-
-    btn.addEventListener('mousedown', (e) => { if(e.button === 0) handlePressStart(e); });
-    btn.addEventListener('mouseup', (e) => { if(e.button === 0) handlePressEnd(e); });
-    btn.addEventListener('touchstart', handlePressStart, {passive: false});
-    btn.addEventListener('touchend', handlePressEnd, {passive: false});
-
-    function actionSingleTap() {
-      if (currentState === 'HOME') {
-        homePageIndex = (homePageIndex + 1) % MAX_HOME_PAGES;
-        eyeAnimClass = 'anim-idle'; 
-      } else if (currentState === 'MAIN_MENU') {
-        menuSelection = (menuSelection + 1) % menus.main.length;
-      } else if (currentState === 'GAMES_MENU') {
-        menuSelection = (menuSelection + 1) % menus.games.length;
-      }
-      renderScreen();
-    }
-
-    function actionDoubleTap() {
-      if (currentState === 'HOME') {
-        if (homePageIndex === 1) pomoActive = !pomoActive;
-        else if (homePageIndex === 2) habitCount++;
-        else if (homePageIndex === 3) {
-          const anims = ['anim-left', 'anim-right', 'anim-down'];
-          eyeAnimClass = anims[Math.floor(Math.random() * anims.length)];
-          setTimeout(() => {
-            if(currentState === 'HOME' && homePageIndex === 3) {
-              eyeAnimClass = 'anim-idle';
-              renderScreen();
-            }
-          }, 2000);
-        }
-      }
-      renderScreen();
-    }
-
-    function actionLongPress() {
-      if (currentState === 'HOME') {
-        currentState = 'MAIN_MENU';
-        menuSelection = 0;
-        menuScroll = 0;
-      } else if (currentState === 'MAIN_MENU') {
-        const selected = menus.main[menuSelection];
-        if (selected === "Back") {
-          currentState = 'HOME';
-          homePageIndex = 0;
-        } else if (selected === "Games...") {
-          currentState = 'GAMES_MENU';
-          menuSelection = 0;
-          menuScroll = 0;
-        } else {
-          screen.style.opacity = '0.5';
-          setTimeout(() => screen.style.opacity = '1', 150);
-        }
-      } else if (currentState === 'GAMES_MENU') {
-        const selected = menus.games[menuSelection];
-        if (selected === "Back") {
-          currentState = 'MAIN_MENU';
-          menuSelection = menus.main.indexOf("Games..."); 
-          if (menuSelection >= menuScroll + 4) menuScroll = menuSelection - 3;
-        } else {
-          screen.innerHTML = `<div class="os-center fw-bold">LOADING GAME...</div>`;
-          setTimeout(() => renderScreen(), 800);
-          return;
-        }
-      }
-      renderScreen();
-    }
-
-    renderScreen();
-
-    // --- WEB SERIAL DEVICE CONTROLLER LOGIC ---
+    // --- STATE VARIABLES ---
     let port = null;
     let reader = null;
     let writer = null;
@@ -1135,52 +1088,58 @@
     let receivedBuffer = "";
     let serialLogBuffer = [];
 
-    const btnConnect = document.getElementById('btnConnectUsb');
-    const btnDisconnect = document.getElementById('btnDisconnect');
-    const connectPanel = document.getElementById('connectPanel');
-    const mainDashboard = document.getElementById('mainDashboard');
-    const connDot = document.getElementById('connDot');
-    const connLabel = document.getElementById('connLabel');
+    // --- UI ELEMENTS ---
+    const connPill = document.getElementById('connPill');
+    const connPillText = document.getElementById('connPillText');
+    const disconnectHeaderBtn = document.getElementById('disconnectHeaderBtn');
+    const disconnectedView = document.getElementById('disconnectedView');
+    const connectedView = document.getElementById('connectedView');
     const logConsole = document.getElementById('serialConsole');
-    const virtualScreenContainer = document.getElementById('virtualScreenContainer');
 
-    // Controls
-    const soundSwitch = document.getElementById('setBuzzerEn');
-    const animSoundSwitch = document.getElementById('setAnimSoundEn');
-    const invertSwitch = document.getElementById('setInvertOled');
-    const selectPageAnim = document.getElementById('selectPageAnim');
-    const selectScreensaver = document.getElementById('selectScreensaver');
-    const selectJgTime = document.getElementById('selectJgTime');
-    const selectAnimDelay = document.getElementById('selectAnimDelay');
-    const inputBleName = document.getElementById('inputBleName');
-    const inputBleMfg = document.getElementById('inputBleMfg');
-    const btnSaveBle = document.getElementById('btnSaveBle');
-    const timezoneSelect = document.getElementById('selectTimezone');
-    const autoSyncSwitch = document.getElementById('setAutoTimeSync');
-    
-    // LED Controls
-    const ledSetupCard = document.getElementById('led-setup-card');
-    const ledBypassSwitch = document.getElementById('setLedBypass');
-    const ledOverrideControls = document.getElementById('led-override-controls');
-    const selectLedEffect = document.getElementById('selectLedEffect');
-    const sliderR = document.getElementById('sliderR');
-    const sliderG = document.getElementById('sliderG');
-    const sliderB = document.getElementById('sliderB');
-    const valR = document.getElementById('valR');
-    const valG = document.getElementById('valG');
-    const valB = document.getElementById('valB');
-    const ledPreview = document.getElementById('ledPreview');
+    // Toast Notification helper
+    function showToast(msg, isError = false) {
+      const t = document.getElementById('toast');
+      t.innerText = msg;
+      if (isError) t.classList.add('error'); else t.classList.remove('error');
+      t.classList.add('show');
+      setTimeout(() => t.classList.remove('show'), 3000);
+    }
 
     function logToConsole(text, type = 'SYSTEM') {
       const timestamp = new Date().toLocaleTimeString();
       const prefix = `[${timestamp}] [${type}] `;
       const line = prefix + text;
       serialLogBuffer.push(line);
-      if (serialLogBuffer.length > 50) serialLogBuffer.shift();
+      if (serialLogBuffer.length > 80) serialLogBuffer.shift();
       logConsole.innerText = serialLogBuffer.join('\n');
       logConsole.scrollTop = logConsole.scrollHeight;
     }
 
+    function clearConsole() {
+      serialLogBuffer = [];
+      logConsole.innerText = "[SYSTEM] Log cleared.";
+    }
+
+    // --- NAVIGATION TABS ---
+    function switchDashTab(idx) {
+      document.querySelectorAll('.tab-btn').forEach((b, i) => {
+        if (i === idx) b.classList.add('active'); else b.classList.remove('active');
+      });
+      document.querySelectorAll('.tab-content').forEach((p, i) => {
+        if (i === idx) p.classList.add('active'); else p.classList.remove('active');
+      });
+    }
+
+    function onDisplayTypeChange(manifest) {
+      document.getElementById('landingInstallButton').setAttribute('manifest', manifest);
+    }
+
+    function updateFlasherManifest() {
+      const m = document.getElementById('flashEnvSelect').value;
+      document.getElementById('flasherBtn').setAttribute('manifest', m);
+    }
+
+    // --- WEB SERIAL LOGIC ---
     async function sendCommand(command) {
       if (!isConnected || !writer) return;
       try {
@@ -1192,7 +1151,7 @@
       }
     }
 
-    btnConnect.onclick = async () => {
+    async function connectSerial() {
       if (!("serial" in navigator)) {
         alert("Web Serial API is not supported in this browser. Please use Google Chrome or Microsoft Edge.");
         return;
@@ -1201,60 +1160,45 @@
       try {
         port = await navigator.serial.requestPort();
         await port.open({ baudRate: 115200 });
-        
+
         isConnected = true;
         writer = port.writable.getWriter();
-        
-        // Update UI states
-        connDot.classList.add('connected');
-        connLabel.textContent = 'USB Connected';
-        btnDisconnect.style.display = 'inline-block';
-        connectPanel.style.display = 'none';
-        mainDashboard.style.display = 'block';
-        virtualScreenContainer.style.display = 'none';
-        
-        logToConsole("Connected to port successfully.");
-        
-        // Start read loop
+
+        connPill.className = 'conn-status-pill connected';
+        connPillText.textContent = 'USB Connected';
+        disconnectHeaderBtn.style.display = 'inline-flex';
+        disconnectedView.classList.remove('active');
+        connectedView.classList.add('active');
+
+        logToConsole("Connected to ESP32-C3 USB port successfully.");
+        showToast("Connected via USB Serial");
+
         readSerialData();
-
-        // Sync Clock Time immediately
         syncTimeNow();
-
-        // Periodically ping to request status
         sendCommand("PING");
       } catch (err) {
         logToConsole(`Connection failed: ${err.message}`, 'ERROR');
-        alert("Web Serial connection failed: " + err.message);
+        showToast("USB Connection Failed", true);
       }
-    };
+    }
 
-    btnDisconnect.onclick = async () => {
+    async function disconnectSerial() {
       isConnected = false;
-      if (reader) {
-        try { await reader.cancel(); } catch(e){}
-      }
-      if (writer) {
-        try { writer.releaseLock(); } catch(e){}
-      }
-      if (port) {
-        try { await port.close(); } catch(e){}
-      }
-      
-      port = null;
-      reader = null;
-      writer = null;
-      
-      // Update UI states
-      connDot.classList.remove('connected');
-      connLabel.textContent = 'Disconnected';
-      btnDisconnect.style.display = 'none';
-      connectPanel.style.display = 'block';
-      mainDashboard.style.display = 'none';
-      virtualScreenContainer.style.display = 'block';
-      
+      if (reader) { try { await reader.cancel(); } catch (e) { } }
+      if (writer) { try { writer.releaseLock(); } catch (e) { } }
+      if (port) { try { await port.close(); } catch (e) { } }
+
+      port = null; reader = null; writer = null;
+
+      connPill.className = 'conn-status-pill disconnected';
+      connPillText.textContent = 'Disconnected';
+      disconnectHeaderBtn.style.display = 'none';
+      connectedView.classList.remove('active');
+      disconnectedView.classList.add('active');
+
       logToConsole("Disconnected.");
-    };
+      showToast("Disconnected");
+    }
 
     async function readSerialData() {
       while (port && port.readable && isConnected) {
@@ -1266,49 +1210,34 @@
             const chunk = new TextDecoder().decode(value);
             receivedBuffer += chunk;
             let lines = receivedBuffer.split("\n");
-            receivedBuffer = lines.pop(); // Keep partial last line
+            receivedBuffer = lines.pop();
             for (let line of lines) {
               line = line.trim();
-              if (line) {
-                parseIncomingLine(line);
-              }
+              if (line) parseIncomingLine(line);
             }
           }
         } catch (err) {
           logToConsole(`Read error: ${err.message}`, 'ERROR');
           break;
         } finally {
-          if (reader) {
-            reader.releaseLock();
-          }
+          if (reader) reader.releaseLock();
         }
       }
-      if (isConnected) {
-        btnDisconnect.click();
-      }
+      if (isConnected) disconnectSerial();
     }
 
     function parseIncomingLine(line) {
       logToConsole(line, 'RX');
-      
+
       if (line.startsWith("STATUS:")) {
         const parts = line.substring(7).split(":");
-        let page = null;
-        let jiggle = null;
-        let sound = null;
-        let animSound = null;
-        let invert = null;
-        let screensaver = null;
-        let animDelay = null;
-        let pageAnim = null;
-        let ledStr = null;
-        let jgTime = null;
-        let bleName = null;
-        let bleMfg = null;
+        let page = null, jiggle = null, sound = null, animSound = null, invert = null;
+        let screensaver = null, animDelay = null, pageAnim = null, dispType = null;
+        let pinsStr = null, ledStr = null, jgTime = null, bleName = null, bleMfg = null;
 
         for (let i = 0; i < parts.length; i += 2) {
           const key = parts[i];
-          const val = parts[i+1];
+          const val = parts[i + 1];
           if (key === "PAGE") page = parseInt(val);
           else if (key === "JIGGLE") jiggle = parseInt(val);
           else if (key === "SOUND") sound = parseInt(val);
@@ -1317,6 +1246,8 @@
           else if (key === "SCREENSAVER") screensaver = parseInt(val);
           else if (key === "ANIMDELAY") animDelay = parseInt(val);
           else if (key === "PAGEANIM") pageAnim = parseInt(val);
+          else if (key === "DISPTYPE") dispType = parseInt(val);
+          else if (key === "PINS") pinsStr = val;
           else if (key === "LED") ledStr = val;
           else if (key === "JGTIME") jgTime = parseInt(val);
           else if (key === "BLENAME") bleName = val;
@@ -1325,135 +1256,113 @@
 
         if (page !== null) {
           document.querySelectorAll('.btn-page').forEach(b => {
-            if (parseInt(b.getAttribute('data-page')) === page) {
-              b.classList.add('active');
-            } else {
-              b.classList.remove('active');
-            }
+            if (parseInt(b.getAttribute('data-page')) === page) b.classList.add('active');
+            else b.classList.remove('active');
           });
         }
 
         if (jiggle !== null) {
           document.querySelectorAll('.btn-jiggle').forEach(b => {
-            if (parseInt(b.getAttribute('data-mode')) === jiggle) {
-              b.classList.add('active');
-            } else {
-              b.classList.remove('active');
-            }
+            if (parseInt(b.getAttribute('data-mode')) === jiggle) b.classList.add('active');
+            else b.classList.remove('active');
           });
         }
 
-        if (sound !== null) soundSwitch.checked = (sound !== 0);
-        if (animSound !== null) animSoundSwitch.checked = (animSound !== 0);
-        if (invert !== null) invertSwitch.checked = (invert !== 0);
-        
-        if (screensaver !== null) selectScreensaver.value = screensaver;
-        if (jgTime !== null) selectJgTime.value = jgTime;
-        if (animDelay !== null) selectAnimDelay.value = animDelay;
-        if (bleName !== null) inputBleName.value = bleName;
-        if (bleMfg !== null) inputBleMfg.value = bleMfg;
-        if (pageAnim !== null) selectPageAnim.value = pageAnim;
+        if (sound !== null) document.getElementById('setBuzzerEn').checked = (sound !== 0);
+        if (animSound !== null) document.getElementById('setAnimSoundEn').checked = (animSound !== 0);
+        if (invert !== null) document.getElementById('setInvertOled').checked = (invert !== 0);
+
+        if (screensaver !== null && document.activeElement !== document.getElementById('selectScreensaver')) document.getElementById('selectScreensaver').value = screensaver;
+        if (jgTime !== null && document.activeElement !== document.getElementById('selectJgTime')) document.getElementById('selectJgTime').value = jgTime;
+        if (animDelay !== null && document.activeElement !== document.getElementById('selectAnimDelay')) document.getElementById('selectAnimDelay').value = animDelay;
+        if (pageAnim !== null && document.activeElement !== document.getElementById('selectPageAnim')) document.getElementById('selectPageAnim').value = pageAnim;
+        if (dispType !== null && document.activeElement !== document.getElementById('selectDispType')) document.getElementById('selectDispType').value = dispType;
+
+        if (bleName !== null && document.activeElement !== document.getElementById('inputBleName')) document.getElementById('inputBleName').value = bleName;
+        if (bleMfg !== null && document.activeElement !== document.getElementById('inputBleMfg')) document.getElementById('inputBleMfg').value = bleMfg;
+
+        if (pinsStr !== null) {
+          const p = pinsStr.split(",");
+          if (p.length === 5) {
+            if (document.activeElement !== document.getElementById('inputBtnPin')) document.getElementById('inputBtnPin').value = p[0];
+            if (document.activeElement !== document.getElementById('inputBuzPin')) document.getElementById('inputBuzPin').value = p[1];
+            if (document.activeElement !== document.getElementById('inputNeoPin')) document.getElementById('inputNeoPin').value = p[2];
+            if (document.activeElement !== document.getElementById('inputSdaPin')) document.getElementById('inputSdaPin').value = p[3];
+            if (document.activeElement !== document.getElementById('inputSclPin')) document.getElementById('inputSclPin').value = p[4];
+          }
+        }
 
         if (ledStr !== null) {
           const l = ledStr.split(",");
-          if (l.length === 5) {
-            const bypass = (parseInt(l[0]) !== 0);
-            ledBypassSwitch.checked = bypass;
-            updateLedControlsState(bypass);
-            
-            selectLedEffect.value = l[1];
-            
-            sliderR.value = l[2]; valR.innerText = l[2];
-            sliderG.value = l[3]; valG.innerText = l[3];
-            sliderB.value = l[4]; valB.innerText = l[4];
-            
-            updateLedPreviewColor();
+          const ledCard = document.getElementById('led-setup-card');
+          const ledDisabledMsg = document.getElementById('led-disabled-msg');
+          if (l.length === 5 && !(l[0] == 0 && l[1] == 4 && l[2] == 0 && l[3] == 0 && l[4] == 0) && dispType !== 1) {
+            ledCard.style.display = 'block';
+            ledDisabledMsg.style.display = 'none';
 
-            // Dynamic show/hide LED setup block if small display (it sends 0,4,0,0,0 as dummy status)
-            if (l[0] == 0 && l[1] == 4 && l[2] == 0 && l[3] == 0 && l[4] == 0) {
-              ledSetupCard.style.display = 'none';
-            } else {
-              ledSetupCard.style.display = 'block';
-            }
+            const bypass = (parseInt(l[0]) !== 0);
+            document.getElementById('setLedBypass').checked = bypass;
+            updateLedControlsState(bypass);
+            document.getElementById('selectLedEffect').value = l[1];
+            document.getElementById('sliderR').value = l[2]; document.getElementById('valR').innerText = l[2];
+            document.getElementById('sliderG').value = l[3]; document.getElementById('valG').innerText = l[3];
+            document.getElementById('sliderB').value = l[4]; document.getElementById('valB').innerText = l[4];
+            updateLedPreviewColor();
+          } else {
+            ledCard.style.display = 'none';
+            ledDisabledMsg.style.display = 'block';
           }
         }
       }
     }
 
-    // Tab view routing logic
-    function switchTab(tabId) {
-      document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
-      document.querySelectorAll('.panel').forEach(panel => panel.classList.remove('active'));
+    // --- CONTROLLER HANDLERS ---
+    function setJiggleMode(mode) { sendCommand(`SET_JIGGLE:${mode}`); }
+    function setPage(page) { sendCommand(`SET_PAGE:${page}`); }
+    function sendToggleSetting(cmd, val) { sendCommand(`${cmd}:${val ? 1 : 0}`); }
 
-      const tabEl = document.getElementById('tab-' + tabId);
-      if (tabEl) {
-        tabEl.classList.add('active');
+    function saveHardwarePins() {
+      const dt = document.getElementById('selectDispType').value;
+      const btn = parseInt(document.getElementById('inputBtnPin').value);
+      const buz = parseInt(document.getElementById('inputBuzPin').value);
+      const neo = parseInt(document.getElementById('inputNeoPin').value);
+      const sda = parseInt(document.getElementById('inputSdaPin').value);
+      const scl = parseInt(document.getElementById('inputSclPin').value);
+
+      if (isNaN(btn) || isNaN(buz) || isNaN(neo) || isNaN(sda) || isNaN(scl)) {
+        alert("Please enter valid numeric GPIO pins.");
+        return;
       }
 
-      const tabBtn = document.getElementById('tabBtn-' + tabId);
-      if (tabBtn) {
-        tabBtn.classList.add('active');
-      }
-
-      if (tabId === 'flasher') {
-        connectPanel.style.display = 'none';
-        virtualScreenContainer.style.display = 'none';
-      }
-    }
-
-    function closeFlasher() {
-      document.getElementById('tab-flasher').classList.remove('active');
-      if (isConnected) {
-        switchTab('controller');
-      } else {
-        connectPanel.style.display = 'block';
-        virtualScreenContainer.style.display = 'block';
+      if (confirm(`Save Display Type & Pinouts?\n\nDisplay Type: ${dt == 0 ? "SH110X (1.3\")" : "SSD1306 (0.96\")"}\nSDA: ${sda}, SCL: ${scl}\nButton: ${btn}, Buzzer: ${buz}, NeoPixel: ${neo}\n\nThe device will save preferences and restart.`)) {
+        sendCommand(`SET_DISPTYPE:${dt}`);
+        setTimeout(() => {
+          sendCommand(`SET_PINS:${btn},${buz},${neo},${sda},${scl}`);
+        }, 300);
       }
     }
 
-    function updateFlasherManifest() {
-      const select = document.getElementById('flashEnvSelect');
-      const btn = document.getElementById('flasherBtn');
-      btn.setAttribute('manifest', select.value);
+    function saveBleIdentity() {
+      const name = document.getElementById('inputBleName').value.trim();
+      const mfg = document.getElementById('inputBleMfg').value.trim();
+      if (!name || !mfg) { alert("Please enter valid BLE name and manufacturer."); return; }
+      if (confirm(`Change Bluetooth name to "${name}" and manufacturer to "${mfg}"?\n\nThe device will reboot to apply changes.`)) {
+        sendCommand(`SET_BLE:${name},${mfg}`);
+      }
     }
 
-    // --- CONTROLLERS EVENT HANDLERS ---
+    function resetTracker() {
+      if (confirm("Reset daily habit tracker to 0?")) sendCommand("RESET_TRACKER");
+    }
 
-    // Page Jumps
-    document.querySelectorAll('.btn-page').forEach(btn => {
-      btn.addEventListener('click', () => {
-        const page = btn.getAttribute('data-page');
-        sendCommand(`SET_PAGE:${page}`);
-      });
-    });
+    function factoryReset() {
+      if (confirm("WARNING: Clear all hardware settings and restart?")) sendCommand("FACTORY_RESET");
+    }
 
-    // Jiggle Modes
-    document.querySelectorAll('.btn-jiggle').forEach(btn => {
-      btn.addEventListener('click', () => {
-        const mode = btn.getAttribute('data-mode');
-        sendCommand(`SET_JIGGLE:${mode}`);
-      });
-    });
-
-    // Play Tone
-    document.getElementById('btnPlayTone').onclick = () => {
-      sendCommand("PLAY_TONE");
-    };
-
-    // Reset Habit Tracker
-    document.getElementById('btnResetTracker').onclick = () => {
-      if (confirm("Reset daily counter tracker to 0?")) {
-        sendCommand("RESET_TRACKER");
-      }
-    };
-
-    // Time offset, auto time sync and clock functions
+    // Time functions
     function getFormattedTime() {
-      let tz = parseFloat(timezoneSelect.value);
-      if (tz === 0) {
-        // Use local host timezone offset in hours
-        tz = -new Date().getTimezoneOffset() / 60;
-      }
+      let tz = parseFloat(document.getElementById('selectTimezone').value);
+      if (tz === 0) tz = -new Date().getTimezoneOffset() / 60;
       let date = new Date();
       const utc = date.getTime() + (date.getTimezoneOffset() * 60000);
       date = new Date(utc + (3600000 * tz));
@@ -1461,39 +1370,29 @@
       const minutes = String(date.getMinutes()).padStart(2, '0');
       const seconds = String(date.getSeconds()).padStart(2, '0');
       const ampm = hours >= 12 ? 'PM' : 'AM';
-      hours = hours % 12;
-      hours = hours ? hours : 12; // 0 should be 12
+      hours = hours % 12 || 12;
       return `${String(hours).padStart(2, '0')}:${minutes}:${seconds} ${ampm}`;
     }
 
     function getGmtString() {
-      const val = parseFloat(timezoneSelect.value);
-      let finalVal = val;
-      if (val === 0) {
-        finalVal = -new Date().getTimezoneOffset() / 60;
-      }
-      if (finalVal === 0) return "GMT+00:00";
-      const sign = finalVal > 0 ? "+" : "-";
-      const absVal = Math.abs(finalVal);
-      const hours = Math.floor(absVal);
-      const mins = Math.round((absVal - hours) * 60);
-      return `GMT${sign}${String(hours).padStart(2, '0')}:${String(mins).padStart(2, '0')}`;
+      let tz = parseFloat(document.getElementById('selectTimezone').value);
+      if (tz === 0) tz = -new Date().getTimezoneOffset() / 60;
+      if (tz === 0) return "GMT+00:00";
+      const sign = tz > 0 ? "+" : "-";
+      const absVal = Math.abs(tz);
+      const h = Math.floor(absVal);
+      const m = Math.round((absVal - h) * 60);
+      return `GMT${sign}${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`;
     }
 
     function syncTimeNow() {
-      const tStr = getFormattedTime();
-      const tzStr = getGmtString();
-      sendCommand(`SYNC_TIME:${tStr} ${tzStr}`);
+      sendCommand(`SYNC_TIME:${getFormattedTime()} ${getGmtString()}`);
     }
-
-    document.getElementById('btnSyncTime').onclick = syncTimeNow;
 
     let lastSentTimeStr = "";
     setInterval(() => {
-      if (isConnected && autoSyncSwitch.checked) {
-        const currentT = getFormattedTime();
-        const tzStr = getGmtString();
-        const fullCmd = `${currentT} ${tzStr}`;
+      if (isConnected && document.getElementById('setAutoTimeSync').checked) {
+        const fullCmd = `${getFormattedTime()} ${getGmtString()}`;
         if (fullCmd !== lastSentTimeStr) {
           lastSentTimeStr = fullCmd;
           sendCommand(`SYNC_TIME:${fullCmd}`);
@@ -1501,126 +1400,101 @@
       }
     }, 1000);
 
-    // --- SETTINGS CHANGE LISTENERS ---
-    btnSaveBle.onclick = () => {
-      const name = inputBleName.value.trim();
-      const mfg = inputBleMfg.value.trim();
-      if (!name || !mfg) {
-        alert("Please enter a valid BLE name and manufacturer.");
-        return;
-      }
-      if (name.includes(',') || mfg.includes(',')) {
-        alert("BLE name and manufacturer cannot contain commas.");
-        return;
-      }
-      if (confirm(`Change Bluetooth name to "${name}" and manufacturer to "${mfg}"?\n\nThe device will restart to apply changes.`)) {
-        sendCommand(`SET_BLE:${name},${mfg}`);
-      }
-    };
-
-    soundSwitch.onchange = () => {
-      sendCommand(`SET_SOUND:${soundSwitch.checked ? 1 : 0}`);
-    };
-
-    animSoundSwitch.onchange = () => {
-      sendCommand(`SET_ANIMSOUND:${animSoundSwitch.checked ? 1 : 0}`);
-    };
-
-    invertSwitch.onchange = () => {
-      sendCommand(`SET_INVERT:${invertSwitch.checked ? 1 : 0}`);
-    };
-
-    selectPageAnim.onchange = () => {
-      sendCommand(`SET_PAGEANIM:${selectPageAnim.value}`);
-    };
-
-    selectScreensaver.onchange = () => {
-      sendCommand(`SET_SCREENSAVER:${selectScreensaver.value}`);
-    };
-
-    selectJgTime.onchange = () => {
-      sendCommand(`SET_JGTIME:${selectJgTime.value}`);
-    };
-
-    selectAnimDelay.onchange = () => {
-      sendCommand(`SET_ANIMDELAY:${selectAnimDelay.value}`);
-    };
-
-    document.getElementById('btnFactoryReset').onclick = () => {
-      if (confirm("WARNING: This will clear all settings preferences stored on the hardware and restart the board. Proceed?")) {
-        // Let's check: does Small and Big support FACTORY_RESET? Let's check C++ code. No, they didn't have FACTORY_RESET serial command.
-        // Let's check how we can send factory reset command over serial. We can add FACTORY_RESET command to C++ too, or we can just send "FACTORY_RESET" and handle it.
-        // Wait! Let's check if the C++ handles reset.
-      }
-    };
-
-    // --- LED BYPASS AND CONTROLS (Only for SH110X) ---
+    // --- LED CONTROL HELPERS ---
     function updateLedControlsState(bypassActive) {
-      selectLedEffect.disabled = !bypassActive;
-      sliderR.disabled = !bypassActive;
-      sliderG.disabled = !bypassActive;
-      sliderB.disabled = !bypassActive;
-      if (bypassActive) {
-        ledOverrideControls.style.opacity = '1';
-        ledOverrideControls.style.pointerEvents = 'auto';
-      } else {
-        ledOverrideControls.style.opacity = '0.5';
-        ledOverrideControls.style.pointerEvents = 'none';
-      }
+      const ctrl = document.getElementById('led-override-controls');
+      if (bypassActive) { ctrl.style.opacity = '1'; ctrl.style.pointerEvents = 'auto'; }
+      else { ctrl.style.opacity = '0.5'; ctrl.style.pointerEvents = 'none'; }
     }
 
-    ledBypassSwitch.addEventListener('change', () => {
-      updateLedControlsState(ledBypassSwitch.checked);
-      sendLedState();
-    });
-
-    selectLedEffect.addEventListener('change', sendLedState);
-
     function sendLedState() {
-      const by = ledBypassSwitch.checked ? 1 : 0;
-      const eff = selectLedEffect.value;
-      const r = sliderR.value;
-      const g = sliderG.value;
-      const b = sliderB.value;
+      const by = document.getElementById('setLedBypass').checked ? 1 : 0;
+      const eff = document.getElementById('selectLedEffect').value;
+      const r = document.getElementById('sliderR').value;
+      const g = document.getElementById('sliderG').value;
+      const b = document.getElementById('sliderB').value;
       sendCommand(`SET_LED:${by},${eff},${r},${g},${b}`);
       updateLedPreviewColor();
     }
 
     function updateLedPreviewColor() {
-      const r = sliderR.value;
-      const g = sliderG.value;
-      const b = sliderB.value;
-      ledPreview.style.background = `rgb(${r}, ${g}, ${b})`;
+      const r = document.getElementById('sliderR').value;
+      const g = document.getElementById('sliderG').value;
+      const b = document.getElementById('sliderB').value;
+      document.getElementById('ledPreview').style.background = `rgb(${r}, ${g}, ${b})`;
+      document.getElementById('valR').innerText = r;
+      document.getElementById('valG').innerText = g;
+      document.getElementById('valB').innerText = b;
     }
 
     let ledSendTimeout = null;
     function throttleLedSend() {
       if (ledSendTimeout) clearTimeout(ledSendTimeout);
       updateLedPreviewColor();
-      valR.innerText = sliderR.value;
-      valG.innerText = sliderG.value;
-      valB.innerText = sliderB.value;
-      ledSendTimeout = setTimeout(() => {
-        sendLedState();
-      }, 100);
-    }
-    sliderR.addEventListener('input', throttleLedSend);
-    sliderG.addEventListener('input', throttleLedSend);
-    sliderB.addEventListener('input', throttleLedSend);
-
-    // --- Flasher Status Logger ---
-    const flasherBtn = document.getElementById('flasherBtn');
-    if (flasherBtn) {
-      flasherBtn.addEventListener('state-changed', (e) => {
-        const states = ["Idle", "Connecting...", "Connected.", "Initializing...", "Flashing...", "Success! Rebooting.", "Error."];
-        logToConsole(`Flasher Status: ${states[e.detail.state] || e.detail.state}`, 'FLASHER');
-      });
-      flasherBtn.addEventListener('error', (e) => {
-        logToConsole(`Flasher Error: ${e.detail.message}`, 'FLASHER');
-      });
+      ledSendTimeout = setTimeout(() => sendLedState(), 100);
     }
 
+    // --- VIRTUAL OLED SCREEN SIMULATOR LOGIC ---
+    const vScreen = document.getElementById('virtual-screen');
+    const vBtn = document.getElementById('virtual-btn');
+    const vTouchDot = document.getElementById('virtualTouchDot');
+    let vPageIndex = 0;
+
+    function renderVirtualScreen() {
+      const dots = ['○', '○', '○', '○'];
+      dots[vPageIndex % 4] = '●';
+      if (vPageIndex === 0) {
+        vScreen.innerHTML = `
+          <div class="os-header">Bluetooth: Paired</div>
+          <div class="os-center">
+            <h3 style="font-size:1.1rem; color:var(--accent);">JIGGLING</h3>
+            <div style="font-size:0.75rem; margin-top:4px; color:var(--text-muted);">Mode: SLOW</div>
+          </div>
+          <div class="page-dots">${dots.join('')}</div>
+        `;
+      } else if (vPageIndex === 1) {
+        vScreen.innerHTML = `
+          <div class="os-header">POMODORO TIMER</div>
+          <div class="os-center">
+            <h2 style="font-size:1.5rem; color:#fff;">25:00</h2>
+            <div style="font-size:0.65rem; color:var(--text-muted); margin-top:4px;">Double Tap to Start</div>
+          </div>
+          <div class="page-dots">${dots.join('')}</div>
+        `;
+      } else if (vPageIndex === 2) {
+        vScreen.innerHTML = `
+          <div class="os-header">DAILY TRACKER</div>
+          <div class="os-center">
+            <h1 style="font-size:2rem; color:#fff;">3</h1>
+            <div style="font-size:0.65rem; color:var(--text-muted);">Double Tap to Add</div>
+          </div>
+          <div class="page-dots">${dots.join('')}</div>
+        `;
+      } else {
+        vScreen.innerHTML = `
+          <div class="os-center">
+            <h2 style="color:var(--accent);">👀</h2>
+            <div style="font-size:0.7rem; color:var(--text-muted); margin-top:4px;">Eye Animation</div>
+          </div>
+          <div class="page-dots">${dots.join('')}</div>
+        `;
+      }
+    }
+
+    vBtn.addEventListener('mousedown', () => {
+      vBtn.classList.add('pressed');
+      vTouchDot.classList.add('active'); // Small touch dot on bottom right corner (125,61)
+    });
+
+    vBtn.addEventListener('mouseup', () => {
+      vBtn.classList.remove('pressed');
+      vTouchDot.classList.remove('active');
+      vPageIndex = (vPageIndex + 1) % 4;
+      renderVirtualScreen();
+    });
+
+    renderVirtualScreen();
   </script>
-
 </body>
+
 </html>
