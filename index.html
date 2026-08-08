@@ -801,25 +801,25 @@
           <div class="form-row-2">
             <div class="form-group">
               <label>I2C SDA Pin</label>
-              <input type="number" id="inputSdaPin" placeholder="21" min="0" max="48" />
+              <input type="number" id="inputSdaPin" value="21" placeholder="21" min="0" max="48" />
             </div>
             <div class="form-group">
               <label>I2C SCL Pin</label>
-              <input type="number" id="inputSclPin" placeholder="20" min="0" max="48" />
+              <input type="number" id="inputSclPin" value="20" placeholder="20" min="0" max="48" />
             </div>
           </div>
           <div class="form-row-3">
             <div class="form-group">
               <label>Touch/Button Pin</label>
-              <input type="number" id="inputBtnPin" placeholder="1" min="0" max="48" />
+              <input type="number" id="inputBtnPin" value="1" placeholder="1" min="0" max="48" />
             </div>
             <div class="form-group">
               <label>Buzzer Pin</label>
-              <input type="number" id="inputBuzPin" placeholder="2" min="0" max="48" />
+              <input type="number" id="inputBuzPin" value="2" placeholder="2" min="0" max="48" />
             </div>
             <div class="form-group">
               <label>NeoPixel Pin</label>
-              <input type="number" id="inputNeoPin" placeholder="6" min="0" max="48" />
+              <input type="number" id="inputNeoPin" value="6" placeholder="6" min="0" max="48" />
             </div>
           </div>
           <button class="btn btn-primary" style="width: 100%; margin-top: 8px;" onclick="saveHardwarePins()">
@@ -1128,6 +1128,9 @@
       document.querySelectorAll('.tab-content').forEach((p, i) => {
         if (i === idx) p.classList.add('active'); else p.classList.remove('active');
       });
+      if (isConnected) {
+        sendCommand("PING");
+      }
     }
 
     function onDisplayTypeChange(manifest) {
@@ -1322,23 +1325,20 @@
     function sendToggleSetting(cmd, val) { sendCommand(`${cmd}:${val ? 1 : 0}`); }
 
     function saveHardwarePins() {
-      const dt = document.getElementById('selectDispType').value;
+      const dt = parseInt(document.getElementById('selectDispType').value);
       const btn = parseInt(document.getElementById('inputBtnPin').value);
       const buz = parseInt(document.getElementById('inputBuzPin').value);
       const neo = parseInt(document.getElementById('inputNeoPin').value);
       const sda = parseInt(document.getElementById('inputSdaPin').value);
       const scl = parseInt(document.getElementById('inputSclPin').value);
 
-      if (isNaN(btn) || isNaN(buz) || isNaN(neo) || isNaN(sda) || isNaN(scl)) {
-        alert("Please enter valid numeric GPIO pins.");
+      if (isNaN(dt) || isNaN(btn) || isNaN(buz) || isNaN(neo) || isNaN(sda) || isNaN(scl)) {
+        alert("Please enter valid numeric GPIO pins and select a display type.");
         return;
       }
 
-      if (confirm(`Save Display Type & Pinouts?\n\nDisplay Type: ${dt == 0 ? "SH110X (1.3\")" : "SSD1306 (0.96\")"}\nSDA: ${sda}, SCL: ${scl}\nButton: ${btn}, Buzzer: ${buz}, NeoPixel: ${neo}\n\nThe device will save preferences and restart.`)) {
-        sendCommand(`SET_DISPTYPE:${dt}`);
-        setTimeout(() => {
-          sendCommand(`SET_PINS:${btn},${buz},${neo},${sda},${scl}`);
-        }, 300);
+      if (confirm(`Save Display Type & Pinouts?\n\nDisplay Type: ${dt == 0 ? "SH110X (1.3\")" : "SSD1306 (0.96\")"}\nSDA: ${sda}, SCL: ${scl}\nButton: ${btn}, Buzzer: ${buz}, NeoPixel: ${neo}\n\nThe device will save preferences to NVS and restart.`)) {
+        sendCommand(`SET_PINS:${btn},${buz},${neo},${sda},${scl},${dt}`);
       }
     }
 
