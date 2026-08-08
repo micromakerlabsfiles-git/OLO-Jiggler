@@ -793,7 +793,7 @@
           </div>
           <div class="form-group">
             <label>OLED Display Type (Saved to Preferences)</label>
-            <select id="selectDispType">
+            <select id="selectDispType" onchange="markPinsUserModified()">
               <option value="0">SH110X — 1.3" OLED (SH1106 / SH1107 with NeoPixel LED)</option>
               <option value="1">SSD1306 — 0.96" OLED (Small display / No LED functionality)</option>
             </select>
@@ -801,30 +801,35 @@
           <div class="form-row-2">
             <div class="form-group">
               <label>I2C SDA Pin</label>
-              <input type="number" id="inputSdaPin" value="21" placeholder="21" min="0" max="48" />
+              <input type="number" id="inputSdaPin" value="20" placeholder="20" min="0" max="48" oninput="markPinsUserModified()" />
             </div>
             <div class="form-group">
               <label>I2C SCL Pin</label>
-              <input type="number" id="inputSclPin" value="20" placeholder="20" min="0" max="48" />
+              <input type="number" id="inputSclPin" value="21" placeholder="21" min="0" max="48" oninput="markPinsUserModified()" />
             </div>
           </div>
           <div class="form-row-3">
             <div class="form-group">
               <label>Touch/Button Pin</label>
-              <input type="number" id="inputBtnPin" value="1" placeholder="1" min="0" max="48" />
+              <input type="number" id="inputBtnPin" value="1" placeholder="1" min="0" max="48" oninput="markPinsUserModified()" />
             </div>
             <div class="form-group">
               <label>Buzzer Pin</label>
-              <input type="number" id="inputBuzPin" value="2" placeholder="2" min="0" max="48" />
+              <input type="number" id="inputBuzPin" value="2" placeholder="2" min="0" max="48" oninput="markPinsUserModified()" />
             </div>
             <div class="form-group">
               <label>NeoPixel Pin</label>
-              <input type="number" id="inputNeoPin" value="6" placeholder="6" min="0" max="48" />
+              <input type="number" id="inputNeoPin" value="6" placeholder="6" min="0" max="48" oninput="markPinsUserModified()" />
             </div>
           </div>
-          <button class="btn btn-primary" style="width: 100%; margin-top: 8px;" onclick="saveHardwarePins()">
-            💾 Save Display Type &amp; Hardware Pins (Reboots Board)
-          </button>
+          <div style="display: flex; gap: 8px; margin-top: 8px;">
+            <button class="btn btn-primary" style="flex: 2;" onclick="saveHardwarePins()">
+              💾 Save Display Type &amp; Hardware Pins
+            </button>
+            <button class="btn btn-secondary" style="flex: 1;" onclick="resetHardwarePins()">
+              🔄 Revert Pins
+            </button>
+          </div>
         </div>
 
         <div class="card">
@@ -875,11 +880,11 @@
           <div class="form-row-2">
             <div class="form-group">
               <label>BLE Device Name</label>
-              <input type="text" id="inputBleName" placeholder="OLO Bit" maxlength="30" />
+              <input type="text" id="inputBleName" placeholder="OLO Bit" maxlength="30" oninput="markBleUserModified()" />
             </div>
             <div class="form-group">
               <label>Manufacturer Name</label>
-              <input type="text" id="inputBleMfg" placeholder="Micromaker Labs" maxlength="30" />
+              <input type="text" id="inputBleMfg" placeholder="Micromaker Labs" maxlength="30" oninput="markBleUserModified()" />
             </div>
           </div>
           <button class="btn btn-primary" style="width: 100%;" onclick="saveBleIdentity()">
@@ -1176,6 +1181,8 @@
         logToConsole("Connected to ESP32-C3 USB port successfully.");
         showToast("Connected via USB Serial");
 
+        pinsUserModified = false;
+        bleUserModified = false;
         readSerialData();
         syncTimeNow();
         sendCommand("PING");
@@ -1279,19 +1286,25 @@
         if (jgTime !== null && document.activeElement !== document.getElementById('selectJgTime')) document.getElementById('selectJgTime').value = jgTime;
         if (animDelay !== null && document.activeElement !== document.getElementById('selectAnimDelay')) document.getElementById('selectAnimDelay').value = animDelay;
         if (pageAnim !== null && document.activeElement !== document.getElementById('selectPageAnim')) document.getElementById('selectPageAnim').value = pageAnim;
-        if (dispType !== null && document.activeElement !== document.getElementById('selectDispType')) document.getElementById('selectDispType').value = dispType;
+        if (dispType !== null && !pinsUserModified && document.activeElement !== document.getElementById('selectDispType')) document.getElementById('selectDispType').value = dispType;
 
-        if (bleName !== null && document.activeElement !== document.getElementById('inputBleName')) document.getElementById('inputBleName').value = bleName;
-        if (bleMfg !== null && document.activeElement !== document.getElementById('inputBleMfg')) document.getElementById('inputBleMfg').value = bleMfg;
+        if (bleName !== null && !bleUserModified && document.activeElement !== document.getElementById('inputBleName')) document.getElementById('inputBleName').value = bleName;
+        if (bleMfg !== null && !bleUserModified && document.activeElement !== document.getElementById('inputBleMfg')) document.getElementById('inputBleMfg').value = bleMfg;
 
-        if (pinsStr !== null) {
+        if (pinsStr !== null && !pinsUserModified) {
           const p = pinsStr.split(",");
           if (p.length === 5) {
-            if (document.activeElement !== document.getElementById('inputBtnPin')) document.getElementById('inputBtnPin').value = p[0];
-            if (document.activeElement !== document.getElementById('inputBuzPin')) document.getElementById('inputBuzPin').value = p[1];
-            if (document.activeElement !== document.getElementById('inputNeoPin')) document.getElementById('inputNeoPin').value = p[2];
-            if (document.activeElement !== document.getElementById('inputSdaPin')) document.getElementById('inputSdaPin').value = p[3];
-            if (document.activeElement !== document.getElementById('inputSclPin')) document.getElementById('inputSclPin').value = p[4];
+            const btnEl = document.getElementById('inputBtnPin');
+            const buzEl = document.getElementById('inputBuzPin');
+            const neoEl = document.getElementById('inputNeoPin');
+            const sdaEl = document.getElementById('inputSdaPin');
+            const sclEl = document.getElementById('inputSclPin');
+
+            if (document.activeElement !== btnEl) btnEl.value = p[0];
+            if (document.activeElement !== buzEl) buzEl.value = p[1];
+            if (document.activeElement !== neoEl) neoEl.value = p[2];
+            if (document.activeElement !== sdaEl) sdaEl.value = p[3];
+            if (document.activeElement !== sclEl) sclEl.value = p[4];
           }
         }
 
@@ -1324,6 +1337,16 @@
     function setPage(page) { sendCommand(`SET_PAGE:${page}`); }
     function sendToggleSetting(cmd, val) { sendCommand(`${cmd}:${val ? 1 : 0}`); }
 
+    let pinsUserModified = false;
+    let bleUserModified = false;
+
+    function markPinsUserModified() { pinsUserModified = true; }
+    function markBleUserModified() { bleUserModified = true; }
+
+    function isSafeGpio(pin) {
+      return !isNaN(pin) && pin >= 0 && pin <= 21 && !(pin >= 11 && pin <= 19);
+    }
+
     function saveHardwarePins() {
       const dt = parseInt(document.getElementById('selectDispType').value);
       const btn = parseInt(document.getElementById('inputBtnPin').value);
@@ -1332,13 +1355,25 @@
       const sda = parseInt(document.getElementById('inputSdaPin').value);
       const scl = parseInt(document.getElementById('inputSclPin').value);
 
-      if (isNaN(dt) || isNaN(btn) || isNaN(buz) || isNaN(neo) || isNaN(sda) || isNaN(scl)) {
-        alert("Please enter valid numeric GPIO pins and select a display type.");
+      if (isNaN(dt) || !isSafeGpio(btn) || !isSafeGpio(buz) || !isSafeGpio(neo) || !isSafeGpio(sda) || !isSafeGpio(scl)) {
+        alert("Invalid GPIO assignment!\nPins must be valid ESP32-C3 GPIOs (0-10, 20, 21).\nSPI Flash pins (11-17) and USB pins (18-19) are restricted.");
+        return;
+      }
+      if (sda === scl) {
+        alert("I2C SDA and SCL pins cannot be the same GPIO.");
         return;
       }
 
       if (confirm(`Save Display Type & Pinouts?\n\nDisplay Type: ${dt == 0 ? "SH110X (1.3\")" : "SSD1306 (0.96\")"}\nSDA: ${sda}, SCL: ${scl}\nButton: ${btn}, Buzzer: ${buz}, NeoPixel: ${neo}\n\nThe device will save preferences to NVS and restart.`)) {
+        pinsUserModified = false;
         sendCommand(`SET_PINS:${btn},${buz},${neo},${sda},${scl},${dt}`);
+      }
+    }
+
+    function resetHardwarePins() {
+      if (confirm("Revert all hardware pin assignments to default settings?\n\nDefault pinout:\n• SDA: 20\n• SCL: 21\n• Touch Button: 1\n• Buzzer: 2\n• NeoPixel: 6\n\nThe device will reboot to apply factory default pins.")) {
+        pinsUserModified = false;
+        sendCommand("RESET_PINS");
       }
     }
 
@@ -1347,6 +1382,7 @@
       const mfg = document.getElementById('inputBleMfg').value.trim();
       if (!name || !mfg) { alert("Please enter valid BLE name and manufacturer."); return; }
       if (confirm(`Change Bluetooth name to "${name}" and manufacturer to "${mfg}"?\n\nThe device will reboot to apply changes.`)) {
+        bleUserModified = false;
         sendCommand(`SET_BLE:${name},${mfg}`);
       }
     }
