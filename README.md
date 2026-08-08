@@ -41,7 +41,7 @@ OLO Jiggler is controlled via a single touch sensor or physical button on the de
 
 ## 🌐 Web Controller Guide (`index.html`)
 
-Open `index.html` in any Web Serial compatible browser (**Google Chrome** or **Microsoft Edge**) and click **🔌 Connect via USB Serial**.
+Open [`Web contrller`](https://micromakerlabsfiles-git.github.io/OLO-Jiggler/) in any Web Serial compatible browser (**Google Chrome** or **Microsoft Edge**) and click **🔌 Connect via USB Serial**.
 
 ### Dashboard Tabs Overview
 
@@ -71,7 +71,7 @@ Open `index.html` in any Web Serial compatible browser (**Google Chrome** or **M
 ## 🔧 Flashing & Firmware Upgrade
 
 1. Connect your ESP32-C3 board to your computer using a data USB-C cable.
-2. Open `index.html` in Google Chrome or MS Edge.
+2. Open [`Web contrller`](https://micromakerlabsfiles-git.github.io/OLO-Jiggler/) in Google Chrome or MS Edge.
 3. On the landing page or **Web Flasher** tab, choose your display target:
    - **SH110X** for 1.3" displays with NeoPixel status LED.
    - **SSD1306** for 0.96" compact displays.
